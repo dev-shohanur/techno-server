@@ -15,6 +15,13 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 
 app.use(bodyParser.json());
+const corsConfig = {
+  origin: "",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+app.use(cors(corsConfig));
+app.options("", cors(corsConfig));
 
 const uri =
   "mongodb+srv://dbUser:ASd2C66WzvIp0e9r@fristusemongodb.yjaddi5.mongodb.net/?retryWrites=true&w=majority";
