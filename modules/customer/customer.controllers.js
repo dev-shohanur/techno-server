@@ -1,5 +1,6 @@
 const { customerCollection } = require("../../index.js");
 const jwt = require("jsonwebtoken");
+const { ObjectId } = require("mongodb");
 
 // Log in an existing user
 const createCustomer = async (req, res) => {
@@ -36,23 +37,34 @@ const createCustomer = async (req, res) => {
     res.status(500).json({ error: "An error occurred" });
   }
 };
+const getCustomerById = async (req, res) => {
+  const id = req.params.id; // Extract the document ID from the request parameters
 
-const getCustomerByNumber = async (req, res) => {
+  console.log(id);
+  // Find the document in the collection
+  customerCollection
+    .findOne({ _id: new ObjectId(id) })
+    .then((document) => {
+      if (document) {
+        console.log(document)
+        res.json(document); // Send the found document as the response
+      }
+      // else {
+      //   res.sendStatus(404); // Send a 404 status code if the document was not found
+      // }
+    })
+    .catch((error) => {
+      console.error("Error finding document:", error);
+      res.status(500).send("Error finding document");
+    });
+};
+
+const getAllCustomer = async (req, res) => {
   try {
-    const { number } = req.body;
-
-    console.log(number);
     // Find the user in the database
-    const customer = await customerCollection.findOne({ number });
+    const customer = await customerCollection.find({}).toArray();
 
-    console.log(customer);
-
-    // if (createNewCustomer) {
-    // return res.status(200).json({ createNewCustomer });
-    // }
-    customer === ""
-      ? res.status(200).json({ customer })
-      : res.status(200).json("It's New Customer");
+     res.status(200).json({ customer })
     // res.status(200).json("customer Already created");
   } catch (err) {
     console.error("Error Create User:", err);
@@ -60,4 +72,19 @@ const getCustomerByNumber = async (req, res) => {
   }
 };
 
-module.exports = { createCustomer, getCustomerByNumber };
+const updateCustomer = (req, res) => {
+  const id = req.params.id; // Extract the document ID from the request parameters
+  const updateData = req.body; // Extract the updated data from the request body
+
+  // Update the document in the collection
+  customerCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
+    .then(() => {
+      res.sendStatus(200); // Send a success status code if the update was successful
+    })
+    .catch((error) => {
+      console.error("Error updating document:", error);
+      res.status(500).send("Error updating document");
+    });
+};
+
+module.exports = { createCustomer, getAllCustomer, getCustomerById };
