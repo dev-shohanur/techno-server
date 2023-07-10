@@ -87,4 +87,9 @@ const updateCustomer = (req, res) => {
     });
 };
 
-module.exports = { createCustomer, getAllCustomer, getCustomerById };
+module.exports = {
+  createCustomer,
+  getAllCustomer,
+  getCustomerById,
+  updateCustomer,
+};

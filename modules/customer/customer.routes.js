@@ -2,7 +2,8 @@ const express = require("express");
 const {
   createCustomer,
   getAllCustomer,
-  getCustomerById
+  getCustomerById,
+  updateCustomer,
 } = require("./customer.controllers");
 const customerRoutes = express.Router();
 
@@ -17,7 +18,7 @@ customerRoutes.get("/:id", (req, res) => {
   getCustomerById(req, res);
 });
 customerRoutes.put("/:id", (req, res) => {
-  getCustomerById(req, res);
+  updateCustomer(req, res);
 });
 
 module.exports = customerRoutes;
