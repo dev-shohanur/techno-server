@@ -3,11 +3,7 @@ const {
   createCustomer,
   getAllCustomer,
   getCustomerById,
-<<<<<<< HEAD
   updateCustomer,
-=======
-  updateCustomer
->>>>>>> Update With Customer Collection
 } = require("./customer.controllers");
 const customerRoutes = express.Router();
 

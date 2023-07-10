@@ -89,13 +89,9 @@ const updateCustomer = (req, res) => {
     });
 };
 
-<<<<<<< HEAD
 module.exports = {
   createCustomer,
   getAllCustomer,
   getCustomerById,
   updateCustomer,
 };
-=======
-module.exports = { createCustomer, getAllCustomer, getCustomerById, updateCustomer };
->>>>>>> Update With Customer Collection
