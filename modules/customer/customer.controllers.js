@@ -76,6 +76,8 @@ const updateCustomer = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
   const updateData = req.body; // Extract the updated data from the request body
 
+  console.log(updateData)
+
   // Update the document in the collection
   customerCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
     .then(() => {
@@ -87,9 +89,13 @@ const updateCustomer = (req, res) => {
     });
 };
 
+<<<<<<< HEAD
 module.exports = {
   createCustomer,
   getAllCustomer,
   getCustomerById,
   updateCustomer,
 };
+=======
+module.exports = { createCustomer, getAllCustomer, getCustomerById, updateCustomer };
+>>>>>>> Update With Customer Collection
