@@ -11,7 +11,7 @@ const customerRoutes = express.Router();
 customerRoutes.post("/", (req, res) => {
   createCustomer(req, res);
 });
-customerRoutes.get("/", (req, res) => {
+customerRoutes.get("/:key", (req, res) => {
   getAllCustomer(req, res);
 });
 customerRoutes.get("/:id", (req, res) => {

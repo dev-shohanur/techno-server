@@ -46,7 +46,7 @@ const getCustomerById = async (req, res) => {
     .findOne({ _id: new ObjectId(id) })
     .then((document) => {
       if (document) {
-        console.log(document)
+        console.log(document);
         res.json(document); // Send the found document as the response
       }
       // else {
@@ -60,11 +60,23 @@ const getCustomerById = async (req, res) => {
 };
 
 const getAllCustomer = async (req, res) => {
+  const search = req.params.key;
   try {
-    // Find the user in the database
-    const customer = await customerCollection.find({}).toArray();
+    let customer = await customerCollection
+      .find({
+        $or: [
+          { name: { $regex: ".*" + search + ".*" } },
+          { number: { $regex: ".*" + search + ".*" } },
+          { address: { $regex: ".*" + search + ".*" } },
+        ],
+      })
+      .toArray();
 
-     res.status(200).json({ customer })
+    // if (customer.length === 0) {
+    //   res.status(200).json("no customer");
+    // } else {
+    res.status(200).json({ customer });
+    // }
     // res.status(200).json("customer Already created");
   } catch (err) {
     console.error("Error Create User:", err);
@@ -77,7 +89,8 @@ const updateCustomer = (req, res) => {
   const updateData = req.body; // Extract the updated data from the request body
 
   // Update the document in the collection
-  customerCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
+  customerCollection
+    .updateOne({ _id: new ObjectId(id) }, { $set: updateData })
     .then(() => {
       res.sendStatus(200); // Send a success status code if the update was successful
     })
