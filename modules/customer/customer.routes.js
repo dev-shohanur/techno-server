@@ -4,6 +4,7 @@ const {
   getAllCustomer,
   getCustomerById,
   updateCustomer,
+  getAllCustomerBySearch,
 } = require("./customer.controllers");
 const customerRoutes = express.Router();
 
@@ -11,12 +12,16 @@ const customerRoutes = express.Router();
 customerRoutes.post("/", (req, res) => {
   createCustomer(req, res);
 });
-customerRoutes.get("/:key", (req, res) => {
-  getAllCustomer(req, res);
-});
-customerRoutes.get("/:id", (req, res) => {
+customerRoutes.get("/data/:id", (req, res) => {
   getCustomerById(req, res);
 });
+customerRoutes.get("/:key", (req, res) => {
+  getAllCustomerBySearch(req, res);
+});
+customerRoutes.get("/", (req, res) => {
+  getAllCustomer(req, res);
+});
+
 customerRoutes.put("/:id", (req, res) => {
   updateCustomer(req, res);
 });
