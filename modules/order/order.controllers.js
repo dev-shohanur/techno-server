@@ -74,6 +74,19 @@ const deleteAOrderById = (req, res) => {
       res.status(500).send("Error finding document");
     });
 };
+const updateDeliveryStatus = (req, res) => {
+  const id = req.params.id;
+  const status = req.body.status;
+
+  console.log(status);
+  // Find the document in the collection
+  // Update a single document
+  OrderCollection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { status: status } }
+  );
+  res.status(200).send("Updated");
+};
 
 module.exports = {
   getAllOrder,
@@ -81,4 +94,5 @@ module.exports = {
   createOrder,
   getAOrder,
   deleteAOrderById,
+  updateDeliveryStatus,
 };

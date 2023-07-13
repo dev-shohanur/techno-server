@@ -5,6 +5,7 @@ const {
   createOrder,
   getAOrder,
   deleteAOrderById,
+  updateDeliveryStatus,
 } = require("./order.controllers.js");
 const orderRoutes = express.Router();
 
@@ -23,6 +24,9 @@ orderRoutes.delete("/:id", (req, res) => {
 });
 orderRoutes.post("/createOrder", (req, res) => {
   createOrder(req, res);
+});
+orderRoutes.put("/deliveryStatus/:id", (req, res) => {
+  updateDeliveryStatus(req, res);
 });
 
 module.exports = orderRoutes;
