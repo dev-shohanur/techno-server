@@ -41,6 +41,9 @@ async function run() {
 
     const OrderCollection = client.db("Platinumys").collection("All Orders");
     const userCollection = client.db("Platinumys").collection("userCollection");
+    const sellsCollection = client
+      .db("Platinumys")
+      .collection("sellsCollection");
     const customerCollection = client
       .db("Platinumys")
       .collection("customerCollection");
@@ -57,6 +60,7 @@ async function run() {
       userCollection,
       officeOrderCollection,
       customerCollection,
+      sellsCollection,
     };
 
     // Routes
@@ -70,6 +74,8 @@ async function run() {
     app.use("/office-order", officeOrderRoutes);
     const customerRoutes = require("./modules/customer/customer.routes");
     app.use("/customer", customerRoutes);
+    const sellsRoutes = require("./modules/Sells/sells.routes");
+    app.use("/sells", sellsRoutes);
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

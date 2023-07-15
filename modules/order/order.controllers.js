@@ -3,7 +3,15 @@ const jwt = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
 
 const getAllOrder = async (req, res) => {
-  const cursor = OrderCollection.find({});
+  const cursor = OrderCollection.find({
+    $or: [
+      { status: "WaitingReview" },
+      { status: "OnHold" },
+      { status: "making" },
+      { status: "ReadyToShip" },
+      { status: "Shipped" },
+    ],
+  });
 
   const orders = await cursor.toArray();
   res.send(orders);
