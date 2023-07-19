@@ -50,6 +50,8 @@ async function run() {
     const officeOrderCollection = client
       .db("Platinumys")
       .collection("OrderFromOffice");
+    const expenseCollection = client.db("Platinumys").collection("expenseCollection");
+    const salaryCollection = client.db("Platinumys").collection("salaryCollection");
 
     // Middleware for parsing JSON data
     app.use(express.json());
@@ -61,6 +63,8 @@ async function run() {
       officeOrderCollection,
       customerCollection,
       sellsCollection,
+      expenseCollection,
+      salaryCollection
     };
 
     // Routes
@@ -76,6 +80,10 @@ async function run() {
     app.use("/customer", customerRoutes);
     const sellsRoutes = require("./modules/Sells/sells.routes");
     app.use("/sells", sellsRoutes);
+    const expenseRoutes = require("./modules/expense/expense.routes");
+    app.use("/expense", expenseRoutes);
+    const salaryRoutes = require("./modules/salary/salary.routes");
+    app.use("/salary", salaryRoutes);
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

@@ -2,6 +2,16 @@ const { userCollection } = require("../../index.js");
 const jwt = require("jsonwebtoken");
 
 // Log in an existing user
+
+
+const getAllUser = async (req, res) => {
+  const user = await userCollection.find({}).toArray();
+
+  res.status(200).json(user);
+}
+
+
+
 const loginUserMyApp = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -57,4 +67,4 @@ const getCurentUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUserMyApp, getCurentUser };
+module.exports = { loginUserMyApp, getCurentUser, getAllUser };
