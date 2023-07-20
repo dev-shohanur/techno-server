@@ -35,10 +35,7 @@ const updateOrder = (req, res) => {
 const createOrder = async (req, res) => {
   const receivedData = req.body;
 
-  console.log(receivedData);
-
   await OrderCollection.insertOne(receivedData);
-  // console.log(result);
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
 };
@@ -46,7 +43,6 @@ const createOrder = async (req, res) => {
 const getAOrder = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  console.log(id);
   // Find the document in the collection
   OrderCollection.findOne({ _id: new ObjectId(id) })
     .then((document) => {
@@ -66,7 +62,6 @@ const getAOrder = (req, res) => {
 const deleteAOrderById = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  console.log(id);
   // Find the document in the collection
   OrderCollection.deleteOne({ _id: new ObjectId(id) })
     .then((document) => {
@@ -86,7 +81,6 @@ const updateDeliveryStatus = (req, res) => {
   const id = req.params.id;
   const status = req.body.status;
 
-  console.log(status);
   // Find the document in the collection
   // Update a single document
   OrderCollection.updateOne(

@@ -16,12 +16,8 @@ const loginUserMyApp = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log(email);
-    console.log(password);
     // Find the user in the database
     const user = await userCollection.findOne({ email });
-
-    console.log(user);
 
     if (!user) {
       return res.status(401).json({ error: "Invalid username or password" });

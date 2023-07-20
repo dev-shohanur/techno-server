@@ -31,11 +31,9 @@ const createCustomer = async (req, res) => {
   try {
     const { name, number, address } = req.body;
 
-    console.log(name, number, address);
     // Find the user in the database
     const customer = await customerCollection.findOne({ number });
 
-    console.log(customer);
 
     let createNewCustomer = "";
 
@@ -48,7 +46,6 @@ const createCustomer = async (req, res) => {
 
       createNewCustomer = newCustomer;
     }
-    console.log(createNewCustomer);
 
     // if (createNewCustomer) {
     // return res.status(200).json({ createNewCustomer });
@@ -78,7 +75,6 @@ const updateCustomer = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
   const updateData = req.body; // Extract the updated data from the request body
 
-  console.log(updateData);
 
   // Update the document in the collection
   customerCollection
@@ -95,13 +91,11 @@ const updateCustomer = (req, res) => {
 const getCustomerById = async (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  console.log(id);
   // Find the document in the collection
   customerCollection
     .findOne({ _id: new ObjectId(id) })
     .then((document) => {
       if (document) {
-        console.log(document);
         res.json(document); // Send the found document as the response
       }
       // else {

@@ -17,10 +17,8 @@ const createSell = async (req, res) => {
 
   const order = await OrderCollection.findOne({ _id: new ObjectId(id) });
 
-  console.log(order);
 
   await sellsCollection.insertOne(order);
-  // console.log(result);
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
 };
@@ -44,7 +42,6 @@ const updateSell = (req, res) => {
 const getASell = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  console.log(id);
   // Find the document in the collection
   sellsCollection
     .findOne({ _id: new ObjectId(id) })

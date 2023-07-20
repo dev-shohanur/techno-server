@@ -6,16 +6,12 @@ const getLastOrder = async (req, res) => {
   const cursor = officeOrderCollection.find({}).sort({ _id: -1 }).limit(1);
 
   const orders = await cursor.toArray();
-  console.log(orders);
   res.send(orders);
 };
 const createOfficeOrder = async (req, res) => {
   const receivedData = req.body;
 
-  console.log(receivedData);
-
   await officeOrderCollection.insertOne(receivedData);
-  // console.log(result);
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
 };
@@ -37,7 +33,6 @@ const getAllOfficeOrder = async (req, res) => {
 
   const cursor = officeOrderCollection.find({ isDeleted: { $eq: "false" } });
 
-  console.log(cursor);
 
   const orders = await cursor.toArray();
   res.send(orders);
@@ -46,7 +41,6 @@ const getAllOfficeOrder = async (req, res) => {
 const getAOfficeOrder = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  console.log(id);
   // Find the document in the collection
   officeOrderCollection
     .findOne({ _id: new ObjectId(id) })
@@ -67,7 +61,6 @@ const getAOfficeOrder = (req, res) => {
 const deleteAOfficeOrderById = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  // console.log(id);
   // Find the document in the collection
   officeOrderCollection
     .deleteOne({ _id: new ObjectId(id) })
@@ -75,7 +68,6 @@ const deleteAOfficeOrderById = (req, res) => {
       if (document) {
         res.json(document); // Send the found document as the response
       }
-      console.log(document);
       // else {
       //   res.sendStatus(404); // Send a 404 status code if the document was not found
       // }
