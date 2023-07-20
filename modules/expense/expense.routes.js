@@ -1,7 +1,8 @@
 const express = require("express");
 const {
   getAllExpense,
-  createExpense
+  createExpense,
+  getExpenseBySearch
 } = require("./expense.controllers");
 const expenseRoutes = express.Router();
 
@@ -9,6 +10,9 @@ const expenseRoutes = express.Router();
 
 expenseRoutes.post("/", (req, res) => {
   createExpense(req, res);
+});
+expenseRoutes.get("/:key", (req, res) => {
+  getExpenseBySearch(req, res);
 });
 expenseRoutes.get("/", (req, res) => {
   getAllExpense(req, res);
