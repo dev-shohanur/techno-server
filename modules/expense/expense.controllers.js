@@ -15,14 +15,112 @@ const createExpense = async (req, res) => {
 };
 const getAllExpense = async (req, res) => {
 
-  const expenses = await expenseCollection.find({}).toArray();
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 5
+  const search = req.query.search || ''
+  let startDate = req.query.startDate || ''; // Replace with the desired start date
+  let endDate = req.query.endDate || ''; // Replace with the desired end date
+  let category = req.query.category || ''; // Replace with the desired end date
+
+  if (startDate === endDate) {
+    console.log(startDate);
+    startDate = '';
+    endDate = '';
+  }
+
+  const skip = (page - 1) * limit
+
+  console.log(page, limit)
+
+  const dateFilter = {};
+  if (startDate && endDate) {
+    dateFilter.date = { $gte: startDate, $lte: endDate };
+  }
+
+  let categoryFilter = { };
+  if (category) {
+    categoryFilter = {category}
+  }
+
+  console.log({categoryFilter})
+
+  // let expenses = await expenseCollection.find({}).skip(skip).limit(limit).toArray();
+
+  let expenses = await expenseCollection.aggregate([
+    {
+      $match: {
+        $or: [
+          { title: { $regex: ".*" + search + ".*" } },
+          { amount: { $regex: ".*" + search + ".*" } },
+          { date: { $regex: ".*" + search + ".*" } },
+          { category: { $regex: ".*" + search + ".*" } },
+          { invoiceId: { $regex: ".*" + search + ".*" } },
+          { remark: { $regex: ".*" + search + ".*" } },
+        ],
+        ...categoryFilter,
+        ...dateFilter
+      }
+    },
+    {
+      $facet: {
+        totalCount: [
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              count: 1
+            }
+          }
+        ],
+        postsData: [
+          {
+            $skip: skip
+          },
+          {
+            $limit: limit
+          }
+        ]
+      }
+    },
+    {
+      $project: {
+        totalCount: { $arrayElemAt: ["$totalCount", 0] },
+        postsData: 1
+      }
+    }
+  ]).toArray();
+
+
+  // await expenses
+
   
   // Send a response back to the client
- res.status(200).json({ expenses });
+  if (expenses.length) {
+    console.log(expenses[0].totalCount)
+    res.status(200).json({expenses: expenses[0]} );
+    
+  } else {
+    res.status(200).json({
+      success: false
+    } );
+    
+  }
 };
 const getExpenseBySearch = async (req, res) => {
 
   const search = req.params.key;
+
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 5
+
+  const skip = (page - 1) * limit
+
+  console.log(page, limit)
 
   const expenses = await expenseCollection.find({
     $or: [
@@ -33,7 +131,7 @@ const getExpenseBySearch = async (req, res) => {
       { invoiceId: { $regex: ".*" + search + ".*" } },
       { remark: { $regex: ".*" + search + ".*" } },
     ],
-  }).toArray();
+  }).skip(skip).limit(limit).toArray();
   // Send a response back to the client
  res.status(200).json({ expenses });
 };
