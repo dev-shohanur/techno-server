@@ -101,7 +101,6 @@ const getAllExpense = async (req, res) => {
   
   // Send a response back to the client
   if (expenses.length) {
-    console.log(expenses[0].totalCount)
     res.status(200).json({expenses: expenses[0]} );
     
   } else {
