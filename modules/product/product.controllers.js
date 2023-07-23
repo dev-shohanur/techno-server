@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { productCollection } = require("../../index.js");
+const { productCollection, productCategory } = require("../../index.js");
 
 
 
@@ -12,6 +12,30 @@ const createProduct = async (req, res) => {
   await productCollection.insertOne(product);
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
+};
+
+const getCategory = async (req, res) => {
+
+ const category = await productCategory.find({}).toArray();
+  // Send a response back to the client
+  res.status(200).json(category);
+};
+const getProductById = async (req, res) => {
+
+  const id = req.params.id;
+
+  const product = await productCollection.find({_id: new ObjectId(id)}).toArray();
+  // Send a response back to the client
+  res.status(200).json(product[0]);
+};
+const updateProductById = async (req, res) => {
+
+  const id = req.params.id;
+  const updateData = req.body
+
+   await productCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+  // Send a response back to the client
+  res.status(200).json("Data Updated");
 };
 
 const getProducts = async (req, res) => {
@@ -30,14 +54,15 @@ const getProducts = async (req, res) => {
   }
 
   let products = await productCollection.aggregate([
+    { $sort: { _id: -1 } },
     {
       $match: {
         $or: [
-          { productName: { $regex: ".*" + search + ".*" } },
-          { price: { $regex: ".*" + search + ".*" } },
-          { productCode: { $regex: ".*" + search + ".*" } },
-          { size: { $regex: ".*" + search + ".*" } },
-          { category: { $regex: ".*" + search + ".*" } }
+          { productName: { $regex: ".*" + search + ".*", $options: "i" } },
+          { price: { $regex: ".*" + search + ".*", $options: "i" } },
+          { productCode: { $regex: ".*" + search + ".*", $options: "i" } },
+          { size: { $regex: ".*" + search + ".*", $options: "i" } },
+          { category: { $regex: ".*" + search + ".*", $options: "i" } }
         ],
         ...categoryFilter
       }
@@ -87,8 +112,24 @@ const getProducts = async (req, res) => {
   }
 }
 
+const updateProductStock = (req, res) => {
+  const id = req.params.id;
+  const stock = req.body.stock;
+
+  // Find the document in the collection
+  // Update a single document
+  productCollection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { stock: stock } }
+  );
+  res.status(200).send("Updated");
+};
 
 module.exports = {
   createProduct,
-  getProducts
+  getProducts,
+  getCategory,
+  getProductById,
+  updateProductById,
+  updateProductStock
 };

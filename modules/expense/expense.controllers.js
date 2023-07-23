@@ -50,12 +50,12 @@ const getAllExpense = async (req, res) => {
     {
       $match: {
         $or: [
-          { title: { $regex: ".*" + search + ".*" } },
-          { amount: { $regex: ".*" + search + ".*" } },
-          { date: { $regex: ".*" + search + ".*" } },
-          { category: { $regex: ".*" + search + ".*" } },
-          { invoiceId: { $regex: ".*" + search + ".*" } },
-          { remark: { $regex: ".*" + search + ".*" } },
+          { title: { $regex: ".*" + search + ".*", $options: "i" } },
+          { amount: { $regex: ".*" + search + ".*", $options: "i" } },
+          { date: { $regex: ".*" + search + ".*", $options: "i" } },
+          { category: { $regex: ".*" + search + ".*", $options: "i" } },
+          { invoiceId: { $regex: ".*" + search + ".*", $options: "i" } },
+          { remark: { $regex: ".*" + search + ".*", $options: "i" } },
         ],
         ...categoryFilter,
         ...dateFilter
@@ -123,12 +123,12 @@ const getExpenseBySearch = async (req, res) => {
 
   const expenses = await expenseCollection.find({
     $or: [
-      { title: { $regex: ".*" + search + ".*" } },
-      { amount: { $regex: ".*" + search + ".*" } },
-      { date: { $regex: ".*" + search + ".*" } },
-      { category: { $regex: ".*" + search + ".*" } },
-      { invoiceId: { $regex: ".*" + search + ".*" } },
-      { remark: { $regex: ".*" + search + ".*" } },
+      { title: { $regex: ".*" + search + ".*", $options: "i" } },
+      { amount: { $regex: ".*" + search + ".*", $options: "i" } },
+      { date: { $regex: ".*" + search + ".*", $options: "i" } },
+      { category: { $regex: ".*" + search + ".*", $options: "i" } },
+      { invoiceId: { $regex: ".*" + search + ".*", $options: "i" } },
+      { remark: { $regex: ".*" + search + ".*", $options: "i" } },
     ],
   }).skip(skip).limit(limit).toArray();
   // Send a response back to the client
