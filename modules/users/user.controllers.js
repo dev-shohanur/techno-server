@@ -31,9 +31,7 @@ const loginUserMyApp = async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign(user, process.env.JWT_TOKEN, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(user, process.env.JWT_TOKEN);
 
     res.status(200).json({ token, user });
   } catch (err) {

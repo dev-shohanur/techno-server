@@ -4,7 +4,6 @@ const userRoutes = express.Router();
 
 // Define the user routes
 userRoutes.post("/login", (req, res) => {
-  console.log("sonar Bangladesh");
   loginUserMyApp(req, res);
 });
 userRoutes.post("/curent-user", (req, res) => {

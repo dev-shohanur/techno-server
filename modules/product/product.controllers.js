@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { productCollection, productCategory } = require("../../index.js");
+const { productCollection, productCategory, voucherCodes } = require("../../index.js");
 
 
 
@@ -20,6 +20,15 @@ const getCategory = async (req, res) => {
   // Send a response back to the client
   res.status(200).json(category);
 };
+const getCategoryById = async (req, res) => {
+
+  const id = req.params.id;
+
+  const category = await productCategory.findOne({ _id: new ObjectId(id) });
+  
+  // Send a response back to the client
+  res.status(200).json(category);
+};
 const getProductById = async (req, res) => {
 
   const id = req.params.id;
@@ -27,6 +36,16 @@ const getProductById = async (req, res) => {
   const product = await productCollection.find({_id: new ObjectId(id)}).toArray();
   // Send a response back to the client
   res.status(200).json(product[0]);
+};
+const getVoucherCodeById = async (req, res) => {
+
+  const code = req.params.code;
+  
+
+  const voucher = await voucherCodes.findOne({ code: code });
+  
+  // Send a response back to the client
+  res.status(200).json(voucher);
 };
 const updateProductById = async (req, res) => {
 
@@ -54,7 +73,7 @@ const getProducts = async (req, res) => {
   }
 
   let products = await productCollection.aggregate([
-    { $sort: { _id: -1 } },
+   
     {
       $match: {
         $or: [
@@ -65,6 +84,31 @@ const getProducts = async (req, res) => {
           { category: { $regex: ".*" + search + ".*", $options: "i" } }
         ],
         ...categoryFilter
+      }
+    },
+    {
+      $lookup: {
+        from: "productCategory",
+        let: { searchId: { $toObjectId: "$category" } },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$searchId"] } } },
+          { $project: { _id: 0 } }
+        ],
+        as: "matchedCategory"
+      }
+    },
+    {
+      $unwind: "$matchedCategory"
+    },
+    {
+      $group: {
+        _id: "$_id",
+        productName: { $first: "$productName" },
+        price: { $first: "$price" },
+        productCode: { $first: "$productCode" },
+        size: { $first: "$size" },
+        category: { $first: "$category" },
+        matchedCategory: { $push: "$matchedCategory" }
       }
     },
     {
@@ -93,6 +137,7 @@ const getProducts = async (req, res) => {
         ]
       }
     },
+    { $sort: { _id: -1 } },
     {
       $project: {
         totalCount: { $arrayElemAt: ["$totalCount", 0] },
@@ -131,5 +176,7 @@ module.exports = {
   getCategory,
   getProductById,
   updateProductById,
-  updateProductStock
+  updateProductStock,
+  getVoucherCodeById,
+  getCategoryById
 };
