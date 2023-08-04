@@ -1,9 +1,12 @@
 const express = require("express");
 const {
   getAllSells,
-  createSells,
+  createSell,
   getASell,
   updateSell,
+  createPosSales,
+  getAllPosSales,
+  getAPosSale
 } = require("./sells.controllers");
 const sellsRoutes = express.Router();
 
@@ -11,6 +14,15 @@ const sellsRoutes = express.Router();
 
 sellsRoutes.get("/", (req, res) => {
   getAllSells(req, res);
+});
+sellsRoutes.get("/pos-sales", (req, res) => {
+  getAllPosSales(req, res);
+});
+sellsRoutes.get("/pos-sales/:id", (req, res) => {
+  getAPosSale(req, res);
+});
+sellsRoutes.post("/pos-sales", (req, res) => {
+  createPosSales(req, res);
 });
 
 sellsRoutes.post("/:id", (req, res) => {

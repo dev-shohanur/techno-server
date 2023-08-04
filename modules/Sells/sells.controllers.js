@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { sellsCollection, OrderCollection } = require("../../index.js");
+const { sellsCollection, OrderCollection, posSales } = require("../../index.js");
 
 const getAllSells = async (req, res) => {
   try {
@@ -21,6 +21,31 @@ const createSell = async (req, res) => {
   await sellsCollection.insertOne(order);
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
+};
+const createPosSales = async (req, res) => {
+
+  const sale = req.body
+
+  await posSales.insertOne(sale);
+  // Send a response back to the client
+  res.json({ message: "Confirm Sales successfully" });
+};
+const getAllPosSales = async (req, res) => {
+
+  let sales = await posSales.find({}).toArray();
+
+  res.status(200).json( {sales} );
+};
+const getAPosSale = async (req, res) => {
+
+  const id = req.params.id
+  console.log(id)
+
+  let sales = await posSales.findOne({ _id: new ObjectId(id) })
+  
+  console.log(sales)
+
+  res.status(200).json( {sales} );
 };
 
 const updateSell = (req, res) => {
@@ -64,4 +89,7 @@ module.exports = {
   getAllSells,
   updateSell,
   getASell,
+  createPosSales,
+  getAllPosSales,
+  getAPosSale
 };
