@@ -45,7 +45,13 @@ const getVoucherCodeById = async (req, res) => {
   const voucher = await voucherCodes.findOne({ code: code });
   
   // Send a response back to the client
-  res.status(200).json(voucher);
+  if (voucher) {
+    res.status(200).json(voucher);
+    
+  } else {
+
+    res.status(200).send("invalid Voucher Code");
+  }
 };
 const updateProductById = async (req, res) => {
 
