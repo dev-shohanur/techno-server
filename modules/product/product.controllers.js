@@ -53,6 +53,20 @@ const getVoucherCodeById = async (req, res) => {
     res.status(200).send("invalid Voucher Code");
   }
 };
+
+const productByProductCode = async (req, res) => {
+  const code = req.params.code;
+  const product = await productCollection.findOne({ productCode: code });
+
+  
+  if (product) {
+    res.status(200).send("This Product Code Already Used");
+  } else {
+    res.status(200).send("You Can Use This Product Code");
+  }
+  
+}
+
 const updateProductById = async (req, res) => {
 
   const id = req.params.id;
@@ -176,6 +190,33 @@ const updateProductStock = (req, res) => {
   res.status(200).send("Updated");
 };
 
+const decreaseProductStock = async (req, res) => {
+  const  cart  = req.body;
+
+  console.log(cart);
+
+  try {
+    for (const product of cart) {
+      const result = await productCollection.updateOne(
+        { _id: new ObjectId(product._id) },
+        { $inc: { [`size.${product.size}`]: -product.quantity } }
+      );
+
+      res.status(200).json({ success: true });
+
+      console.log(`${result.modifiedCount} document updated for product with ID: ${product._id}`);
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+
+
+}
+
+
 module.exports = {
   createProduct,
   getProducts,
@@ -184,5 +225,7 @@ module.exports = {
   updateProductById,
   updateProductStock,
   getVoucherCodeById,
-  getCategoryById
+  getCategoryById,
+  productByProductCode,
+  decreaseProductStock
 };

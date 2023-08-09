@@ -23,14 +23,11 @@ const getAllExpense = async (req, res) => {
   let category = req.query.category || ''; // Replace with the desired end date
 
   if (startDate === endDate) {
-    console.log(startDate);
     startDate = '';
     endDate = '';
   }
 
   const skip = (page - 1) * limit
-
-  console.log(page, limit)
 
   const dateFilter = {};
   if (startDate && endDate) {
@@ -42,7 +39,6 @@ const getAllExpense = async (req, res) => {
     categoryFilter = {category}
   }
 
-  console.log({categoryFilter})
 
   // let expenses = await expenseCollection.find({}).skip(skip).limit(limit).toArray();
 
@@ -119,7 +115,6 @@ const getExpenseBySearch = async (req, res) => {
 
   const skip = (page - 1) * limit
 
-  console.log(page, limit)
 
   const expenses = await expenseCollection.find({
     $or: [

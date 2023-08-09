@@ -27,35 +27,42 @@ const getAllCustomerBySearch = async (req, res) => {
     res.status(500).json({ error: "An error occurred" });
   }
 };
+
 const createCustomer = async (req, res) => {
+
+  
   try {
     const { name, number, address } = req.body;
-
     // Find the user in the database
+    // return res.json({ user: req.body})
     const customer = await customerCollection.findOne({ number });
-
-
+    
     let createNewCustomer = "";
-
-    if (!createNewCustomer === "") {
-      const newCustomer = await customerCollection.insertOne({
+    
+    console.log(customer);
+    if (!customer) {
+       await customerCollection.insertOne({
         name,
         number,
         address,
       });
-
-      createNewCustomer = newCustomer;
+      
+      return res.status(200).json({success: true});
     }
+    return res.status(200).json({success: true});
 
     // if (createNewCustomer) {
-    // return res.status(200).json({ createNewCustomer });
+    //   res.status(200).json(createNewCustomer);
+    // } else {
+    //   res.status(200).json(customer);
     // }
-    !createCustomer === ""
-      ? res.status(200).json({ createNewCustomer })
-      : res.status(200).json(customer);
+
+    // createNewCustomer !== ""
+    //   ? res.status(200).json( createNewCustomer )
+    //   : res.status(200).json(customer);
   } catch (err) {
     console.error("Error Create User:", err);
-    res.status(500).json({ error: "An error occurred" });
+    res.status(204).json({ error: "An error occurred" });
   }
 };
 
@@ -108,10 +115,31 @@ const getCustomerById = async (req, res) => {
     });
 };
 
+const getCustomerByNumber = async (req, res) => {
+  const number = req.params.number; // Extract the document ID from the request parameters
+
+  // Find the document in the collection
+  customerCollection
+    .findOne({ number })
+    .then((document) => {
+      if (document) {
+        res.json(document); // Send the found document as the response
+      }
+      // else {
+      //   res.sendStatus(404); // Send a 404 status code if the document was not found
+      // }
+    })
+    .catch((error) => {
+      console.error("Error finding document:", error);
+      res.status(500).send("Error finding document");
+    });
+};
+
 module.exports = {
   createCustomer,
   getAllCustomer,
   getCustomerById,
   updateCustomer,
   getAllCustomerBySearch,
+  getCustomerByNumber,
 };

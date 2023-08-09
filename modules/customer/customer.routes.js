@@ -5,6 +5,7 @@ const {
   getCustomerById,
   updateCustomer,
   getAllCustomerBySearch,
+  getCustomerByNumber
 } = require("./customer.controllers");
 const customerRoutes = express.Router();
 
@@ -14,6 +15,9 @@ customerRoutes.post("/", (req, res) => {
 });
 customerRoutes.get("/data/:id", (req, res) => {
   getCustomerById(req, res);
+});
+customerRoutes.get("/number/:number", (req, res) => {
+  getCustomerByNumber(req, res);
 });
 customerRoutes.get("/:key", (req, res) => {
   getAllCustomerBySearch(req, res);

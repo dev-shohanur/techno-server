@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { sellsCollection, OrderCollection, posSales } = require("../../index.js");
+const { sellsCollection, OrderCollection, posSales, productCollection } = require("../../index.js");
 
 const getAllSells = async (req, res) => {
   try {
@@ -26,6 +26,13 @@ const createPosSales = async (req, res) => {
 
   const sale = req.body
 
+  // await sale?.cart?.map( async (product) => {
+  //   const finedProduct = await productCollection.findOne({ _id: new ObjectId(product._id) })
+    
+  //   const updateStock = Number(product?.quantity) - Number(finedProduct.size[product?.size?.slice(',')[0]])
+
+  // })
+
   await posSales.insertOne(sale);
   // Send a response back to the client
   res.json({ message: "Confirm Sales successfully" });
@@ -39,7 +46,6 @@ const getAllPosSales = async (req, res) => {
 const getAPosSale = async (req, res) => {
 
   const id = req.params.id
-  console.log(id)
 
   let sales = await posSales.findOne({ _id: new ObjectId(id) })
   
