@@ -33,23 +33,22 @@ const createCustomer = async (req, res) => {
   
   try {
     const { name, number, address } = req.body;
+
+
     // Find the user in the database
     // return res.json({ user: req.body})
     const customer = await customerCollection.findOne({ number });
     
-    let createNewCustomer = "";
-    
-    console.log(customer);
     if (!customer) {
-       await customerCollection.insertOne({
+      const createdCustomer = await customerCollection.insertOne({
         name,
         number,
         address,
       });
       
-      return res.status(200).json({success: true});
+      return res.status(200).json(createdCustomer);
     }
-    return res.status(200).json({success: true});
+    return res.status(200).json(customer);
 
     // if (createNewCustomer) {
     //   res.status(200).json(createNewCustomer);
@@ -119,20 +118,22 @@ const getCustomerByNumber = async (req, res) => {
   const number = req.params.number; // Extract the document ID from the request parameters
 
   // Find the document in the collection
-  customerCollection
-    .findOne({ number })
-    .then((document) => {
-      if (document) {
-        res.json(document); // Send the found document as the response
-      }
-      // else {
-      //   res.sendStatus(404); // Send a 404 status code if the document was not found
-      // }
-    })
-    .catch((error) => {
+  try {
+    customerCollection
+      .findOne({ number })
+      .then((document) => {
+        if (document) {
+          res.json(document); // Send the found document as the response
+        }
+        res.json(); // Send the found document as the response
+        // else {
+        //   res.sendStatus(404); // Send a 404 status code if the document was not found
+        // }
+      })
+  } catch(error) {
       console.error("Error finding document:", error);
       res.status(500).send("Error finding document");
-    });
+    }
 };
 
 module.exports = {

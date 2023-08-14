@@ -55,7 +55,7 @@ async function run() {
     const productCollection = client.db("Platinumys").collection("productCollection");
     const productCategory = client.db("Platinumys").collection("productCategory");
     const voucherCodes = client.db("Platinumys").collection("voucherCodes");
-    const posSales = client.db("Platinumys").collection("posSales");
+    const sales = client.db("Platinumys").collection("sales");
 
     // Middleware for parsing JSON data
     app.use(express.json());
@@ -72,7 +72,7 @@ async function run() {
       productCollection,
       productCategory,
       voucherCodes,
-      posSales
+      sales
     };
 
     // Routes
@@ -86,8 +86,8 @@ async function run() {
     app.use("/office-order", officeOrderRoutes);
     const customerRoutes = require("./modules/customer/customer.routes");
     app.use("/customer", customerRoutes);
-    const sellsRoutes = require("./modules/Sells/sells.routes");
-    app.use("/sells", sellsRoutes);
+    const salesRoutes = require("./modules/sales/sales.routes");
+    app.use("/sales", salesRoutes);
     const expenseRoutes = require("./modules/expense/expense.routes");
     app.use("/expense", expenseRoutes);
     const salaryRoutes = require("./modules/salary/salary.routes");

@@ -78,16 +78,21 @@ const deleteAOrderById = (req, res) => {
     });
 };
 const updateDeliveryStatus = (req, res) => {
-  const id = req.params.id;
-  const status = req.body.status;
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
 
-  // Find the document in the collection
-  // Update a single document
-  OrderCollection.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: { status: status } }
-  );
-  res.status(200).send("Updated");
+    // Find the document in the collectio
+    // Update a single document
+    OrderCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status: status } }
+    );
+    res.status(200).send("Updated");
+  } catch (error) {
+    console.log(error)
+    res.status(204).send(error);
+  }
 };
 
 module.exports = {
