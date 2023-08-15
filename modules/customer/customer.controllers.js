@@ -35,6 +35,8 @@ const createCustomer = async (req, res) => {
     const { name, number, address } = req.body;
 
 
+    console.log(name, number, address)
+
     // Find the user in the database
     // return res.json({ user: req.body})
     const customer = await customerCollection.findOne({ number });
@@ -123,7 +125,7 @@ const getCustomerByNumber = async (req, res) => {
       .findOne({ number })
       .then((document) => {
         if (document) {
-          res.json(document); // Send the found document as the response
+          return res.json(document); // Send the found document as the response
         }
         res.json(); // Send the found document as the response
         // else {

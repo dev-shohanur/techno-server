@@ -11,6 +11,8 @@ const getLastOrder = async (req, res) => {
 const createOfficeOrder = async (req, res) => {
   const receivedData = req.body;
 
+  console.log(receivedData)
+
   await officeOrderCollection.insertOne(receivedData);
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
@@ -41,21 +43,27 @@ const getAllOfficeOrder = async (req, res) => {
 const getAOfficeOrder = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
+  console.log(id,"000")
+
   // Find the document in the collection
-  officeOrderCollection
-    .findOne({ _id: new ObjectId(id) })
-    .then((document) => {
-      if (document) {
-        res.json(document); // Send the found document as the response
-      }
-      // else {
-      //   res.sendStatus(404); // Send a 404 status code if the document was not found
-      // }
-    })
-    .catch((error) => {
+  try {
+    officeOrderCollection
+      .findOne({ _id: new ObjectId(id) })
+      .then((document) => {
+        if (document) {
+          res.json(document); // Send the found document as the response
+        }
+
+        console.log(document)
+        // else {
+        //   res.sendStatus(404); // Send a 404 status code if the document was not found
+        // }
+      })
+
+ } catch(error)  {
       console.error("Error finding document:", error);
       res.status(500).send("Error finding document");
-    });
+    };
 };
 
 const deleteAOfficeOrderById = (req, res) => {

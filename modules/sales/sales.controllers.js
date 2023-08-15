@@ -26,9 +26,9 @@ const createPosSale = async (req, res) => {
   try {
     const order = req.body
 
-    await sales.insertOne(order);
+   const sale = await sales.insertOne(order);
     // Send a response back to the client
-    res.json({ message: "Data received successfully" });
+    res.json(sale);
   } catch (error) {
     console.log(error)
     res.json(error);
