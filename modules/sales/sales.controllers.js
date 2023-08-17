@@ -1,9 +1,9 @@
 const { ObjectId } = require("mongodb");
-const { sales, OrderCollection, productCollection } = require("../../index.js");
+const { sales, OrderCollection, productCollection, salesReturns } = require("../../index.js");
 
 const getAllSales = async (req, res) => {
   try {
-    let sells = await sales.find({}).toArray();
+    let sells = await sales.find({}).sort({ _id: -1 }).toArray();
 
     res.status(200).json({ sells });
   } catch (err) {
@@ -26,7 +26,7 @@ const createPosSale = async (req, res) => {
   try {
     const order = req.body
 
-   const sale = await sales.insertOne(order);
+    const sale = await sales.insertOne(order);
     // Send a response back to the client
     res.json(sale);
   } catch (error) {
@@ -72,10 +72,34 @@ const getASale = (req, res) => {
     });
 };
 
+
+
+const createReturnSale = async (req, res) => {
+  const sale = req.body
+  
+  await salesReturns.insertOne(sale)
+  
+  res.status(200).json("Sale Return Success")
+  
+}
+
+const returnSale = async (req, res) => {
+  const saleId = req.params.id;
+
+  console.log(saleId)
+
+  await sales.deleteOne({ _id: new ObjectId(saleId) })
+
+  res.sendStatus(200);
+
+}
+
 module.exports = {
   getAllSales,
   updateSale,
   getASale,
   createOnlineSale,
-  createPosSale
+  createPosSale,
+  returnSale,
+  createReturnSale
 };

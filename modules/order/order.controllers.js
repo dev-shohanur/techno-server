@@ -13,7 +13,7 @@ const getAllOrder = async (req, res) => {
     ],
   });
 
-  const orders = await cursor.toArray();
+  const orders = await cursor.sort({ _id: -1 }).toArray();
   res.send(orders);
 };
 

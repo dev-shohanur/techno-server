@@ -70,7 +70,7 @@ const createCustomer = async (req, res) => {
 const getAllCustomer = async (req, res) => {
   const search = req.params.key;
   try {
-    let customer = await customerCollection.find({}).toArray();
+    let customer = await customerCollection.find({}).sort({ _id: -1 }).toArray();
 
     res.status(200).json({ customer });
   } catch (err) {

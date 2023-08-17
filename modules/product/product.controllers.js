@@ -85,7 +85,11 @@ const getProducts = async (req, res) => {
   let category = req.query.category || '';
 
 
-  const skip = (page - 1) * limit
+  let skip = 0
+   skip = (page - 1) * limit
+
+
+  console.log(skip)
 
   let categoryFilter = {};
   if (category) {
@@ -93,7 +97,7 @@ const getProducts = async (req, res) => {
   }
 
   let products = await productCollection.aggregate([
-   
+    // { $sort: { _id: -1 } },
     {
       $match: {
         $or: [
@@ -149,6 +153,9 @@ const getProducts = async (req, res) => {
         ],
         postsData: [
           {
+            $sort: { _id: -1 } // Sorting in ascending order of serialNumber
+          },
+          {
             $skip: skip
           },
           {
@@ -157,7 +164,6 @@ const getProducts = async (req, res) => {
         ]
       }
     },
-    { $sort: { _id: -1 } },
     {
       $project: {
         totalCount: { $arrayElemAt: ["$totalCount", 0] },
@@ -216,6 +222,32 @@ const decreaseProductStock = async (req, res) => {
 
 }
 
+const addProductStock = async (req, res) => {
+  const  cart  = req.body;
+
+  console.log(cart);
+
+  try {
+    for (const product of cart) {
+      const result = await productCollection.updateOne(
+        { _id: new ObjectId(product._id) },
+        { $inc: { [`size.${product.size}`]: +product.quantity } }
+      );
+
+      res.status(200).json({ success: true });
+
+      console.log(`${result.modifiedCount} document updated for product with ID: ${product._id}`);
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+
+
+}
+
 
 module.exports = {
   createProduct,
@@ -227,5 +259,6 @@ module.exports = {
   getVoucherCodeById,
   getCategoryById,
   productByProductCode,
-  decreaseProductStock
+  decreaseProductStock,
+  addProductStock
 };

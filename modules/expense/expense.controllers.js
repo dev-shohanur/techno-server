@@ -75,6 +75,9 @@ const getAllExpense = async (req, res) => {
         ],
         postsData: [
           {
+            $sort: { _id: -1 } // Sorting in ascending order of serialNumber
+          },
+          {
             $skip: skip
           },
           {
@@ -89,7 +92,7 @@ const getAllExpense = async (req, res) => {
         postsData: 1
       }
     }
-  ]).toArray();
+  ]).sort({ _id: -1 }).toArray();
 
 
   // await expenses

@@ -56,6 +56,7 @@ async function run() {
     const productCategory = client.db("Platinumys").collection("productCategory");
     const voucherCodes = client.db("Platinumys").collection("voucherCodes");
     const sales = client.db("Platinumys").collection("sales");
+    const salesReturns = client.db("Platinumys").collection("salesReturns");
 
     // Middleware for parsing JSON data
     app.use(express.json());
@@ -72,7 +73,8 @@ async function run() {
       productCollection,
       productCategory,
       voucherCodes,
-      sales
+      sales,
+      salesReturns
     };
 
     // Routes

@@ -33,7 +33,7 @@ const getAllOfficeOrder = async (req, res) => {
 
   // res.json({ data, totalDocuments });
 
-  const cursor = officeOrderCollection.find({ isDeleted: { $eq: "false" } });
+  const cursor = officeOrderCollection.find({ isDeleted: { $eq: "false" } }).sort({ _id: -1 });
 
 
   const orders = await cursor.toArray();

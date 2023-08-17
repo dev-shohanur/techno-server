@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  createProduct, getProducts, getCategory, getProductById, updateProductById, updateProductStock, getVoucherCodeById, getCategoryById, productByProductCode, decreaseProductStock
+  createProduct, getProducts, getCategory, getProductById, updateProductById, updateProductStock, getVoucherCodeById, getCategoryById, productByProductCode, decreaseProductStock, addProductStock
 } = require("./product.controllers");
 const productRoutes = express.Router();
 
@@ -16,6 +16,9 @@ productRoutes.get("/", (req, res) => {
 
 productRoutes.put("/stock-decrease", (req, res) => {
   decreaseProductStock(req, res);
+});
+productRoutes.put("/stock-add", (req, res) => {
+  addProductStock(req, res);
 });
 productRoutes.get("/:code", (req, res) => {
   productByProductCode(req, res);
