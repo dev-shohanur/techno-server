@@ -94,6 +94,14 @@ const returnSale = async (req, res) => {
 
 }
 
+const getAllReturnSale = async (req, res) => {
+
+ const returnSale =  await salesReturns.find({}).sort({_id: -1}).toArray()
+
+  res.status(200).json(returnSale)
+
+}
+
 module.exports = {
   getAllSales,
   updateSale,
@@ -101,5 +109,6 @@ module.exports = {
   createOnlineSale,
   createPosSale,
   returnSale,
-  createReturnSale
+  createReturnSale,
+  getAllReturnSale
 };

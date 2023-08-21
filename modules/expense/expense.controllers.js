@@ -109,6 +109,9 @@ const getAllExpense = async (req, res) => {
     
   }
 };
+
+
+
 const getExpenseBySearch = async (req, res) => {
 
   const search = req.params.key;
@@ -133,9 +136,21 @@ const getExpenseBySearch = async (req, res) => {
  res.status(200).json({ expenses });
 };
 
+const getExpenses = async (req, res) => {
+  try {
+    let expense = await expenseCollection.find({}).sort({ _id: -1 }).toArray();
+
+    res.status(200).json({ expense });
+  } catch (err) {
+    console.error("Error Create User:", err);
+    res.status(500).json({ error: "An error occurred" });
+  }
+}
+
 
 module.exports = {
   createExpense,
   getAllExpense,
-  getExpenseBySearch
+  getExpenseBySearch,
+  getExpenses
 };

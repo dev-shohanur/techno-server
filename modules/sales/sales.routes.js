@@ -7,6 +7,7 @@ const {
   createPosSale,
   createOnlineSale,
   createReturnSale,
+  getAllReturnSale,
 } = require("./sales.controllers");
 const salesRoutes = express.Router();
 
@@ -14,6 +15,9 @@ const salesRoutes = express.Router();
 
 salesRoutes.get("/", (req, res) => {
   getAllSales(req, res);
+});
+salesRoutes.get("/return-sales", (req, res) => {
+  getAllReturnSale(req, res);
 });
 
 salesRoutes.post("/return-sale", (req, res) => {

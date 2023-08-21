@@ -57,6 +57,8 @@ async function run() {
     const voucherCodes = client.db("Platinumys").collection("voucherCodes");
     const sales = client.db("Platinumys").collection("sales");
     const salesReturns = client.db("Platinumys").collection("salesReturns");
+    const productions = client.db("Platinumys").collection("productions");
+    const productionCategory = client.db("Platinumys").collection("productionCategory");
 
     // Middleware for parsing JSON data
     app.use(express.json());
@@ -74,7 +76,9 @@ async function run() {
       productCategory,
       voucherCodes,
       sales,
-      salesReturns
+      salesReturns,
+      productions,
+      productionCategory
     };
 
     // Routes
@@ -96,6 +100,8 @@ async function run() {
     app.use("/salary", salaryRoutes);
     const productRoutes = require("./modules/product/product.routes");
     app.use("/product", productRoutes);
+    const productionRoutes = require("./modules/productions/productions.routes");
+    app.use("/production", productionRoutes);
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
