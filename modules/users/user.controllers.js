@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { userCollection } = require("../../index.js");
 const jwt = require("jsonwebtoken");
 
@@ -6,6 +7,19 @@ const jwt = require("jsonwebtoken");
 
 const getAllUser = async (req, res) => {
   const user = await userCollection.find({}).toArray();
+
+  res.status(200).json(user);
+}
+const getAllTailor = async (req, res) => {
+  const user = await userCollection.find({ role: "tailor"}).toArray();
+
+  res.status(200).json(user);
+}
+const getUserById = async (req, res) => {
+
+  const id = req.params.id
+
+  const user = await userCollection.findOne({_id: new ObjectId(id)});
 
   res.status(200).json(user);
 }
@@ -61,4 +75,4 @@ const getCurentUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUserMyApp, getCurentUser, getAllUser };
+module.exports = { loginUserMyApp, getCurentUser, getAllUser, getUserById, getAllTailor };
