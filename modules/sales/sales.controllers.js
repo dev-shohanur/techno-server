@@ -12,6 +12,14 @@ const getAllSales = async (req, res) => {
   }
 };
 
+
+const getLastSale = async (req, res) => {
+  const cursor = sales.find({}).sort({ _id: -1 }).limit(1);
+
+  const orders = await cursor.toArray();
+  res.send(orders);
+};
+
 const createOnlineSale = async (req, res) => {
   const id = req.params.id;
 
@@ -110,5 +118,6 @@ module.exports = {
   createPosSale,
   returnSale,
   createReturnSale,
-  getAllReturnSale
+  getAllReturnSale,
+  getLastSale
 };

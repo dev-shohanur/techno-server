@@ -8,10 +8,15 @@ const {
   createOnlineSale,
   createReturnSale,
   getAllReturnSale,
+  getLastSale
 } = require("./sales.controllers");
 const salesRoutes = express.Router();
 
 // Define the Sells routes
+salesRoutes.get("/last", (req, res) => {
+  getLastSale(req, res);
+});
+
 
 salesRoutes.get("/", (req, res) => {
   getAllSales(req, res);
