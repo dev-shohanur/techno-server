@@ -10,7 +10,6 @@ const expenseRoutes = express.Router();
 // Define the Sells routes
 
 expenseRoutes.get("/expenses/", (req, res) => {
-  console.log("2222222")
   getExpenses(req, res);
 });
 expenseRoutes.post("/", (req, res) => {
