@@ -30,7 +30,7 @@ const getAllCustomerBySearch = async (req, res) => {
 
 const createCustomer = async (req, res) => {
 
-  
+
   try {
     const { name, number, address } = req.body;
 
@@ -40,14 +40,14 @@ const createCustomer = async (req, res) => {
     // Find the user in the database
     // return res.json({ user: req.body})
     const customer = await customerCollection.findOne({ number });
-    
+
     if (!customer) {
       const createdCustomer = await customerCollection.insertOne({
         name,
         number,
         address,
       });
-      
+
       return res.status(200).json(createdCustomer);
     }
     return res.status(200).json(customer);
@@ -68,11 +68,62 @@ const createCustomer = async (req, res) => {
 };
 
 const getAllCustomer = async (req, res) => {
-  const search = req.params.key;
-  try {
-    let customer = await customerCollection.find({}).sort({ _id: -1 }).toArray();
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 5
+  const search = req.query.search || '';
+  const skip = (page - 1) * limit
 
-    res.status(200).json({ customer });
+  console.log(search)
+
+  try {
+    let customer = await customerCollection.aggregate([
+      {
+        $match: {
+          $or: [
+            { name: { $regex: ".*" + search + ".*", $options: "i" } },
+            { number: { $regex: ".*" + search + ".*", $options: "i" } },
+            { address: { $regex: ".*" + search + ".*", $options: "i" } },
+          ]
+        }
+      },
+      {
+        $facet: {
+          totalCount: [
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                count: 1
+              }
+            }
+          ],
+          postsData: [
+            {
+              $sort: { _id: -1 } // Sorting in ascending order of serialNumber
+            },
+            {
+              $skip: skip
+            },
+            {
+              $limit: limit
+            }
+          ]
+        }
+      },
+      {
+        $project: {
+          totalCount: { $arrayElemAt: ["$totalCount", 0] },
+          postsData: 1
+        }
+      }
+    ]).sort({ _id: -1 }).toArray();
+
+    res.status(200).json( customer );
   } catch (err) {
     console.error("Error Create User:", err);
     res.status(500).json({ error: "An error occurred" });
@@ -132,10 +183,10 @@ const getCustomerByNumber = async (req, res) => {
         //   res.sendStatus(404); // Send a 404 status code if the document was not found
         // }
       })
-  } catch(error) {
-      console.error("Error finding document:", error);
-      res.status(500).send("Error finding document");
-    }
+  } catch (error) {
+    console.error("Error finding document:", error);
+    res.status(500).send("Error finding document");
+  }
 };
 
 module.exports = {

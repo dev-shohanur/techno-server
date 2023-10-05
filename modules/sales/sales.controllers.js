@@ -4,21 +4,66 @@ const { sales, OrderCollection, productCollection, salesReturns } = require("../
 const getAllSales = async (req, res) => {
   try {
 
-      const search = req.params.key;
+    const search = Number(req.query.search);
 
+    let invoiceID;
+    if (search > 0) {
+      invoiceID = {$or: [
+        { invoiceID: search }
+      ]}
+    }
+
+    console.log(invoiceID)
       const page = Number(req.query.page) || 1
       const limit = Number(req.query.limit) || 5
 
       const skip = (page - 1) * limit
 
 
-    const sales = await sales.find({
-        $or: [
-        { invoiceID: { $regex: ".*" + search + ".*", $options: "i" } }
-        ],
-      }).skip(skip).limit(limit).toArray();
+    const allSales = await sales.aggregate([
+      {
+        $match: {
+          ...invoiceID
+        }
+      },
+      {
+        $facet: {
+          totalCount: [
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                count: 1
+              }
+            }
+          ],
+          postsData: [
+            {
+              $sort: { _id: -1 } // Sorting in ascending order of serialNumber
+            },
+            {
+              $skip: skip
+            },
+            {
+              $limit: limit
+            }
+          ]
+        }
+      },
+      {
+        $project: {
+          totalCount: { $arrayElemAt: ["$totalCount", 0] },
+          postsData: 1
+        }
+      }
+    ]).sort({ _id: -1 }).toArray();;
       // Send a response back to the client
-    res.status(200).json({ sales });
+    res.status(200).json(allSales );
   } catch (err) {
     console.error("Error Create User:", err);
     res.status(500).json({ error: "An error occurred" });
@@ -123,6 +168,66 @@ const getAllReturnSale = async (req, res) => {
 
 }
 
+const getCustomerBuy = async (req, res) => {
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 5
+  const id = req.query.id || 0
+  const skip = (page - 1) * limit
+
+  try {
+    let customer = await sales.aggregate([
+      {
+        $match: {
+          $or: [
+            { customerId: id},
+          ]
+        }
+      },
+      {
+        $facet: {
+          totalCount: [
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                count: 1
+              }
+            }
+          ],
+          postsData: [
+            {
+              $sort: { _id: -1 } // Sorting in ascending order of serialNumber
+            },
+            {
+              $skip: skip
+            },
+            {
+              $limit: limit
+            }
+          ]
+        }
+      },
+      {
+        $project: {
+          totalCount: { $arrayElemAt: ["$totalCount", 0] },
+          postsData: 1
+        }
+      }
+    ]).sort({ _id: -1 }).toArray();
+
+    res.status(200).json(customer);
+  } catch (err) {
+    console.error("Error Create User:", err);
+    res.status(500).json({ error: "An error occurred" });
+  }
+};
+
+
 module.exports = {
   getAllSales,
   updateSale,
@@ -132,5 +237,6 @@ module.exports = {
   returnSale,
   createReturnSale,
   getAllReturnSale,
-  getLastSale
+  getLastSale,
+  getCustomerBuy
 };

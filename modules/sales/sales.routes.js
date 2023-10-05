@@ -8,8 +8,10 @@ const {
   createOnlineSale,
   createReturnSale,
   getAllReturnSale,
-  getLastSale
+  getLastSale,
+  getCustomerBuy
 } = require("./sales.controllers");
+const verifyTokenMiddleware = require("../../verifyTokenMiddleware");
 const salesRoutes = express.Router();
 
 // Define the Sells routes
@@ -18,11 +20,14 @@ salesRoutes.get("/last", (req, res) => {
 });
 
 
-salesRoutes.get("/", (req, res) => {
+salesRoutes.get("/", verifyTokenMiddleware, (req, res) => {
   getAllSales(req, res);
 });
 salesRoutes.get("/return-sales", (req, res) => {
   getAllReturnSale(req, res);
+});
+salesRoutes.get("/customer-buy", (req, res) => {
+  getCustomerBuy(req, res);
 });
 
 salesRoutes.post("/return-sale", (req, res) => {
