@@ -11,12 +11,36 @@ const getLastOrder = async (req, res) => {
 const createOfficeOrder = async (req, res) => {
   const receivedData = req.body;
 
-  console.log(receivedData)
-
-  await officeOrderCollection.insertOne(receivedData);
+  const createdOrder = await officeOrderCollection.insertOne(receivedData);
   // Send a response back to the client
-  res.json({ message: "Data received successfully" });
+  return res.status(200).json(createdOrder)
 };
+
+const updateOrderStatus = (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    // Find the document in the collectio
+    // Update a single document
+    officeOrderCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status: status } }
+    );
+    res.status(200).send("Updated");
+  } catch (error) {
+    console.log(error)
+    res.status(204).send(error);
+  }
+};
+
+const getOrderByTailor = async (req, res) => {
+
+  const id = req.params.id
+  const order = await officeOrderCollection.find({ tailorId: id }).sort({ _id: -1 }).toArray();
+  res.send(order);
+};
+
 const getAllOfficeOrder = async (req, res) => {
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
@@ -43,7 +67,7 @@ const getAllOfficeOrder = async (req, res) => {
 const getAOfficeOrder = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
 
-  console.log(id,"000")
+  console.log(id, "000")
 
   // Find the document in the collection
   try {
@@ -60,10 +84,10 @@ const getAOfficeOrder = (req, res) => {
         // }
       })
 
- } catch(error)  {
-      console.error("Error finding document:", error);
-      res.status(500).send("Error finding document");
-    };
+  } catch (error) {
+    console.error("Error finding document:", error);
+    res.status(500).send("Error finding document");
+  };
 };
 
 const deleteAOfficeOrderById = (req, res) => {
@@ -92,4 +116,6 @@ module.exports = {
   getAOfficeOrder,
   deleteAOfficeOrderById,
   getLastOrder,
+  getOrderByTailor,
+  updateOrderStatus
 };

@@ -5,7 +5,14 @@ const {
   createProduction,
   getAllProduction,
   updatePaymentStatus,
-  getThisWeekProduction
+  getThisWeekProduction,
+  getProductionById,
+  createCustomProduction,
+  getCustomProductionById,
+  getTaskByTailorId,
+  updateCustomProductionStatus,
+  getAllCustomProduction,
+  updateRejectedText
 } = require("./productions.controllers");
 const productionRoutes = express.Router();
 
@@ -13,6 +20,31 @@ const productionRoutes = express.Router();
 
 productionRoutes.post("/", (req, res) => {
   createProduction(req, res);
+});
+productionRoutes.post("/custom-production", (req, res) => {
+  createCustomProduction(req, res);
+});
+productionRoutes.get("/custom-production", (req, res) => {
+  getAllCustomProduction(req, res);
+});
+productionRoutes.get("/custom-production/:id", (req, res) => {
+  getCustomProductionById(req, res);
+});
+productionRoutes.put("/custom-production/:id", (req, res) => {
+  updateRejectedText(req, res);
+});
+
+productionRoutes.get("/tailor/:id", (req, res) => {
+  getTaskByTailorId(req, res);
+});
+productionRoutes.put("/status/:id", (req, res) => {
+  updateCustomProductionStatus(req, res);
+});
+
+
+
+productionRoutes.get("/:id", (req, res) => {
+  getProductionById(req, res);
 });
 productionRoutes.put("/:id", (req, res) => {
   updatePaymentStatus(req, res);

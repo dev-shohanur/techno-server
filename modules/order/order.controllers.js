@@ -17,6 +17,7 @@ const getAllOrder = async (req, res) => {
   res.send(orders);
 };
 
+
 const updateOrder = (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
   const updateData = req.body; // Extract the updated data from the request body
@@ -95,6 +96,33 @@ const updateDeliveryStatus = (req, res) => {
   }
 };
 
+const updateProductionId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const productionId = req.body.productionId;
+    const index = req.body.index;
+
+    // const dataPath = cart[1].customMade[index].productionId
+
+    OrderCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { [`cart.1.customMade.${index}.productionId`]: productionId } },
+      {new: true}
+    );
+    res.status(200).send("Updated");
+  } catch (error) {
+    console.log(error)
+    res.status(204).send(error);
+  }
+}
+
+const getLastOrder = async (req, res) => {
+  const cursor = officeOrderCollection.find({}).sort({ _id: -1 }).limit(1);
+
+  const orders = await cursor.toArray();
+  res.send(orders);
+};
+
 module.exports = {
   getAllOrder,
   updateOrder,
@@ -102,4 +130,6 @@ module.exports = {
   getAOrder,
   deleteAOrderById,
   updateDeliveryStatus,
+  getLastOrder,
+  updateProductionId,
 };

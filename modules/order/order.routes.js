@@ -6,12 +6,21 @@ const {
   getAOrder,
   deleteAOrderById,
   updateDeliveryStatus,
+  updateProductionId
 } = require("./order.controllers.js");
+const { getLastOrder } = require("../officeOrder/officeOrder.controllers.js");
 const orderRoutes = express.Router();
 
-// Define the user routes
+
+orderRoutes.get("/last", (req, res) => {
+  getLastOrder(req, res);
+});
 orderRoutes.get("/", (req, res) => {
   getAllOrder(req, res);
+});
+
+orderRoutes.put("/production/:id", (req, res) => {
+  updateProductionId(req, res);
 });
 orderRoutes.get("/:id", (req, res) => {
   getAOrder(req, res);

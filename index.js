@@ -58,6 +58,7 @@ async function run() {
     const sales = client.db("Platinumys").collection("sales");
     const salesReturns = client.db("Platinumys").collection("salesReturns");
     const productions = client.db("Platinumys").collection("productions");
+    const customProductions = client.db("Platinumys").collection("customProductions");
     const productionCategory = client.db("Platinumys").collection("productionCategory");
 
     // Middleware for parsing JSON data
@@ -78,7 +79,8 @@ async function run() {
       sales,
       salesReturns,
       productions,
-      productionCategory
+      productionCategory,
+      customProductions
     };
 
     // Routes

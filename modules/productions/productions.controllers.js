@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { productions, productionCategory } = require("../../index.js");
+const { productions, productionCategory, customProductions } = require("../../index.js");
 
 
 
@@ -12,14 +12,75 @@ const getCategory = async (req, res) => {
 
   res.status(200).json(category);
 }
+const getProductionById = async (req, res) => {
+
+  const {id} = req.params
+
+  const production = await productions.find({tailorId: id,status: "notAccepted"}).toArray();
+
+  res.status(200).json(production);
+}
 const createProduction = async (req, res) => {
 
   const production = req.body;
 
-  await productions.insertOne(production)
+  const result = await productions.insertOne(production)
 
-  res.status(200).json({ success: true });
+  res.status(200).json(result);
 }
+
+const createCustomProduction = async (req, res) => {
+  const production = req.body;
+
+  const result = await customProductions.insertOne(production);
+
+  res.status(200).json(result);
+}
+
+const getCustomProductionById = async (req, res) => {
+
+  const { id } = req.params
+  
+  console.log(id)
+
+  const production = await customProductions.findOne({ _id: new ObjectId(id) });
+
+  console.log(production)
+
+  
+  res.status(200).json(production);
+}
+
+const getAllCustomProduction = async (req, res) => {
+  const production = await customProductions.find({}).toArray();
+
+  res.status(200).json(production)
+}
+
+const getTaskByTailorId = async (req, res) => {
+
+  const id = req.params.id
+  const production = await customProductions.find({ tailorId: id }).sort({ _id: -1 }).toArray();
+  console.log(production)
+  res.send(production);
+};
+
+const updateCustomProductionStatus = (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    customProductions.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status: status } }
+    );
+    res.status(200).send("Updated");
+  } catch (error) {
+    console.log(error)
+    res.status(204).send(error);
+  }
+};
+
 const createCategory = async (req, res) => {
 
   const category = req.body;
@@ -29,6 +90,24 @@ const createCategory = async (req, res) => {
   await productionCategory.insertOne(category)
 
   res.status(200).json({ success: true });
+}
+
+const updateRejectedText = async (req, res) => { 
+  try {
+    const id = req.params.id;
+    const rejectText = req.body.rejectText;
+
+    customProductions.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { rejectText: rejectText } },
+      {new: true}
+    );
+    res.status(200).send("Updated");
+  } catch (error) {
+    console.log(error)
+    res.status(204).send(error);
+  }
+
 }
 
 
@@ -227,5 +306,12 @@ module.exports = {
   createProduction,
   getAllProduction,
   updatePaymentStatus,
-  getThisWeekProduction
+  getThisWeekProduction,
+  getProductionById,
+  createCustomProduction,
+  getCustomProductionById,
+  getTaskByTailorId,
+  updateCustomProductionStatus,
+  getAllCustomProduction,
+  updateRejectedText
 };
