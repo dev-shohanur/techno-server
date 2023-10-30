@@ -20,6 +20,7 @@ productRoutes.put("/stock-decrease", (req, res) => {
 productRoutes.put("/stock-add", (req, res) => {
   addProductStock(req, res);
 });
+
 productRoutes.get("/:code", (req, res) => {
   productByProductCode(req, res);
 });

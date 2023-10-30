@@ -60,9 +60,9 @@ const productByProductCode = async (req, res) => {
 
   
   if (product) {
-    res.status(200).send("This Product Code Already Used");
+    res.status(200).send(product);
   } else {
-    res.status(200).send("You Can Use This Product Code");
+    res.status(200).send(product);
   }
   
 }
@@ -260,5 +260,5 @@ module.exports = {
   getCategoryById,
   productByProductCode,
   decreaseProductStock,
-  addProductStock
+  addProductStock,
 };

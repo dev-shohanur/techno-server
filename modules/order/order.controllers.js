@@ -1,4 +1,4 @@
-const { OrderCollection } = require("../../index.js");
+const { OrderCollection, defaultSize } = require("../../index.js");
 const jwt = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
 
@@ -15,6 +15,12 @@ const getAllOrder = async (req, res) => {
 
   const orders = await cursor.sort({ _id: -1 }).toArray();
   res.send(orders);
+};
+const getAllDefaultSize = async (req, res) => {
+  const cursor = defaultSize.find({});
+
+  const sizes = await cursor.sort({ _id: -1 }).toArray();
+  res.send(sizes);
 };
 
 
@@ -104,12 +110,12 @@ const updateProductionId = async (req, res) => {
 
     // const dataPath = cart[1].customMade[index].productionId
 
-    OrderCollection.updateOne(
+   const updateProduction = OrderCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { [`cart.1.customMade.${index}.productionId`]: productionId } },
       {new: true}
     );
-    res.status(200).send("Updated");
+    res.status(200).send(updateProduction);
   } catch (error) {
     console.log(error)
     res.status(204).send(error);
@@ -117,7 +123,7 @@ const updateProductionId = async (req, res) => {
 }
 
 const getLastOrder = async (req, res) => {
-  const cursor = officeOrderCollection.find({}).sort({ _id: -1 }).limit(1);
+  const cursor = OrderCollection.find({}).sort({ _id: -1 }).limit(1);
 
   const orders = await cursor.toArray();
   res.send(orders);
@@ -132,4 +138,5 @@ module.exports = {
   updateDeliveryStatus,
   getLastOrder,
   updateProductionId,
+  getAllDefaultSize
 };

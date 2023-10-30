@@ -6,7 +6,8 @@ const {
   getAOrder,
   deleteAOrderById,
   updateDeliveryStatus,
-  updateProductionId
+  updateProductionId,
+  getAllDefaultSize
 } = require("./order.controllers.js");
 const { getLastOrder } = require("../officeOrder/officeOrder.controllers.js");
 const orderRoutes = express.Router();
@@ -17,6 +18,9 @@ orderRoutes.get("/last", (req, res) => {
 });
 orderRoutes.get("/", (req, res) => {
   getAllOrder(req, res);
+});
+orderRoutes.get("/size", (req, res) => {
+  getAllDefaultSize(req, res);
 });
 
 orderRoutes.put("/production/:id", (req, res) => {

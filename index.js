@@ -60,6 +60,7 @@ async function run() {
     const productions = client.db("Platinumys").collection("productions");
     const customProductions = client.db("Platinumys").collection("customProductions");
     const productionCategory = client.db("Platinumys").collection("productionCategory");
+    const defaultSize = client.db("Platinumys").collection("defaultSizes");
 
     // Middleware for parsing JSON data
     app.use(express.json());
@@ -67,6 +68,7 @@ async function run() {
     //Export Collection
     module.exports = {
       OrderCollection,
+      defaultSize,
       userCollection,
       officeOrderCollection,
       customerCollection,
