@@ -7,11 +7,15 @@ const {
   deleteAOrderById,
   updateDeliveryStatus,
   updateProductionId,
-  getAllDefaultSize
+  getAllDefaultSize,
+  testEndpoint
 } = require("./order.controllers.js");
 const { getLastOrder } = require("../officeOrder/officeOrder.controllers.js");
 const orderRoutes = express.Router();
 
+orderRoutes.get("/test-endpoint", (req, res) => {
+  testEndpoint(req, res);
+});
 
 orderRoutes.get("/last", (req, res) => {
   getLastOrder(req, res);
@@ -38,8 +42,10 @@ orderRoutes.delete("/:id", (req, res) => {
 orderRoutes.post("/createOrder", (req, res) => {
   createOrder(req, res);
 });
+
 orderRoutes.put("/deliveryStatus/:id", (req, res) => {
   updateDeliveryStatus(req, res);
 });
+
 
 module.exports = orderRoutes;

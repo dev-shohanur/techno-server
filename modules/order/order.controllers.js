@@ -1,4 +1,4 @@
-const { OrderCollection, defaultSize } = require("../../index.js");
+const { OrderCollection, defaultSize,customProductions } = require("../../index.js");
 const jwt = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
 
@@ -14,6 +14,50 @@ const getAllOrder = async (req, res) => {
   });
 
   const orders = await cursor.sort({ _id: -1 }).toArray();
+ 
+  orders.map((order) => {
+    const status = []
+    const customMade = order?.cart[1]?.customMade;
+      customMade?.map((item) => {
+        status.push(customProductions.findOne({ _id: new ObjectId(item?.productionId) }))
+      })
+    
+    if (status?.length > 0) {
+      const successStatus = status.filter(
+        (item) => item?.status === 'success'
+      );
+      const makingStatus = status.filter(
+        (item) => item?.status === 'making'
+      );
+
+      if (
+        customMade?.length === successStatus?.length
+      ) {
+       return   OrderCollection.updateOne(
+          { _id: new ObjectId(order?._id) },
+          { $set: { status: 'ReadyToShip' } }
+        );
+      }
+      if (
+        customMade?.length === makingStatus?.length
+      ) {
+        return OrderCollection.updateOne(
+          { _id: new ObjectId(order?._id) },
+          { $set: { status: 'making' } }
+        );
+      }
+      return OrderCollection.updateOne(
+        { _id: new ObjectId(order?._id) },
+        {
+          $set: {
+            status: 'WaitingReview' } }
+      );
+    }
+    
+  })
+
+
+
   res.send(orders);
 };
 const getAllDefaultSize = async (req, res) => {
@@ -129,7 +173,44 @@ const getLastOrder = async (req, res) => {
   res.send(orders);
 };
 
+
+const testEndpoint = async (req, res) => {
+  // OrderCollection
+  const pipeline = [
+    {
+      $unwind: '$cart'
+    },
+    {
+      $unwind: '$cart.customMade'
+    },
+    {
+      $lookup: {
+        from: 'customProductions',
+        localField: 'cart.customMade.productionId',
+        foreignField: '_id',
+        as: 'customProductions'
+      }
+    },
+    {
+      $match: {
+        'customProductions.status': 'success'
+      }
+    },
+    {
+      $group: {
+        _id: '$_id'
+      }
+    }
+  ];
+
+  const ordersToUpdate = await OrderCollection.aggregate(pipeline).toArray();
+
+  res.json(ordersToUpdate)
+
+}
+
 module.exports = {
+  testEndpoint,
   getAllOrder,
   updateOrder,
   createOrder,
