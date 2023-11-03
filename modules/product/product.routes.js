@@ -39,7 +39,7 @@ productRoutes.put("/stock/:id", (req, res) => {
   updateProductStock(req, res);
 });
 
-productRoutes.get("/:id", (req, res) => {
+productRoutes.get("/product/:id", (req, res) => {
   getProductById(req, res);
 });
 productRoutes.get("/code/:code", (req, res) => {

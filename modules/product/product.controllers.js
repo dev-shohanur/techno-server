@@ -30,12 +30,11 @@ const getCategoryById = async (req, res) => {
   res.status(200).json(category);
 };
 const getProductById = async (req, res) => {
-
   const id = req.params.id;
+  const product = await productCollection.findOne({ _id: new ObjectId(id) });
 
-  const product = await productCollection.find({_id: new ObjectId(id)}).toArray();
   // Send a response back to the client
-  res.status(200).json(product[0]);
+  res.status(200).json(product);
 };
 const getVoucherCodeById = async (req, res) => {
 
@@ -199,8 +198,6 @@ const updateProductStock = (req, res) => {
 const decreaseProductStock = async (req, res) => {
   const  cart  = req.body;
 
-  console.log(cart);
-
   try {
     for (const product of cart) {
       const result = await productCollection.updateOne(
@@ -213,10 +210,7 @@ const decreaseProductStock = async (req, res) => {
       console.log(`${result.modifiedCount} document updated for product with ID: ${product._id}`);
     }
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    })
+    res.status(500).json({success: false,})
   }
 
 
