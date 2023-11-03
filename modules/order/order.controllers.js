@@ -5,6 +5,7 @@ const { ObjectId } = require("mongodb");
 var Promise = require("promise");
 
 const getAllOrder = async (req, res) => {
+  const { type } = req.query;
   try {
     const cursor = OrderCollection.find({
       $or: [
@@ -17,6 +18,10 @@ const getAllOrder = async (req, res) => {
     });
 
     const orders = await cursor.sort({ _id: -1 }).toArray();
+
+    if (type === 'test') {
+      return res.json(orders);
+    }
 
     for (const order of orders) {
       const customMade = order?.cart[1]?.customMade;
@@ -71,8 +76,10 @@ const getAllOrder = async (req, res) => {
 
     res.json(orders);
   } catch (error) {
+    console.log('error', 'order fetch failed');
+    res.status(403).send('something went wrong!')
     console.log(error)
-    res.json(error)
+    // res.json(error)
   }
 };
 
