@@ -22,7 +22,7 @@ const getAllOrder = async (req, res) => {
   //     ],
   //   }).skip(parseInt(skip)).limit(parseInt(limit));
 
-    
+
 
 
   //   const orders = await cursor.sort({ _id: -1 }).toArray();
@@ -171,7 +171,57 @@ const getAllOrder = async (req, res) => {
 
     const orders = await OrderCollection.aggregate(pipeline).toArray();
 
-    res.json({ totalOrders: await OrderCollection.countDocuments(), orders});
+    for (const order of orders) {
+      const customMade = order?.cart[1]?.customMade;
+      console.log('customMade', customMade);
+
+      if (customMade) {
+        let production = [];
+
+        for (const item of customMade) {
+          if (item?.productionId) {
+            const productionStatus = await customProductions.findOne({
+              _id: new ObjectId(item?.productionId),
+            });
+
+            production.push(productionStatus);
+          }
+        }
+
+
+        const successStatus = production.filter(
+          (item) => item?.status === 'success'
+        );
+
+        const makingStatus = production.filter(
+          (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
+        );
+
+
+        if (customMade.length === successStatus.length) {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: 'ReadyToShip' } }
+          );
+        }
+
+        if (customMade.length === makingStatus.length) {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: 'making' } }
+          );
+        }
+
+        if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: 'WaitingReview' } }
+          );
+        }
+      }
+
+      res.json({ totalOrders: await OrderCollection.countDocuments(), orders });
+    }
   } catch (error) {
     console.log('error', 'order fetch failed');
     res.status(403).send('something went wrong!')
