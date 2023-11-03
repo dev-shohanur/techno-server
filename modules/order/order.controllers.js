@@ -5,7 +5,7 @@ const { ObjectId } = require("mongodb");
 var Promise = require("promise");
 
 const getAllOrder = async (req, res) => {
-  const { type, limit = 100 } = req.query;
+  const { type, limit = 100 , skip = 0} = req.query;
   try {
     const cursor = OrderCollection.find({
       $or: [
@@ -15,7 +15,7 @@ const getAllOrder = async (req, res) => {
         { status: "ReadyToShip" },
         { status: "Shipped" },
       ],
-    }).limit(parseInt(limit));
+    }).skip(parseInt(skip)).limit(parseInt(limit));
 
     const orders = await cursor.sort({ _id: -1 }).toArray();
 
