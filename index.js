@@ -16,7 +16,7 @@ app.use(cors());
 
 app.use(bodyParser.json());
 const corsConfig = {
-  origin: "https://platinumys-826ed.web.app",
+  origin: "",
   headers: "Content-Type",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],

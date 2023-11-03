@@ -1,81 +1,177 @@
-const { OrderCollection, defaultSize, customProductions, productCollection, productCategory  } = require("../../index.js");
+const { OrderCollection, defaultSize, customProductions, productCollection, productCategory } = require("../../index.js");
 const jwt = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
 // const { Promise } = require("mongoose");
 var Promise = require("promise");
 
 const getAllOrder = async (req, res) => {
-  const { type, limit = 100 , skip = 0} = req.query;
+
+
+  // try {
+  //   const { type, limit = 10, page = 1 } = req.query;
+  //   let skip = 0
+  //   skip = (Number(page) - 1) * Number(limit)
+  //   console.log(limit,page,skip)
+  //   const cursor = OrderCollection.find({
+  //     $or: [
+  //       { status: "WaitingReview" },
+  //       { status: "OnHold" },
+  //       { status: "making" },
+  //       { status: "ReadyToShip" },
+  //       { status: "Shipped" },
+  //     ],
+  //   }).skip(parseInt(skip)).limit(parseInt(limit));
+
+    
+
+
+  //   const orders = await cursor.sort({ _id: -1 }).toArray();
+
+  //   for (const order of orders) {
+  //     const customMade = order?.cart[1]?.customMade;
+  //     console.log('customMade', customMade);
+
+  //     if (customMade) {
+  //       let production = [];
+
+  //       for (const item of customMade) {
+  //         if (item?.productionId) {
+  //           const productionStatus = await customProductions.findOne({
+  //             _id: new ObjectId(item?.productionId),
+  //           });
+
+  //           production.push(productionStatus);
+  //         }
+  //       }
+
+
+  //       const successStatus = production.filter(
+  //         (item) => item?.status === 'success'
+  //       );
+
+  //       const makingStatus = production.filter(
+  //         (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
+  //       );
+
+
+  //       if (customMade.length === successStatus.length) {
+  //         await OrderCollection.updateOne(
+  //           { _id: new ObjectId(order._id) },
+  //           { $set: { status: 'ReadyToShip' } }
+  //         );
+  //       }
+
+  //       if (customMade.length === makingStatus.length) {
+  //         await OrderCollection.updateOne(
+  //           { _id: new ObjectId(order._id) },
+  //           { $set: { status: 'making' } }
+  //         );
+  //       }
+
+  //       if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
+  //         await OrderCollection.updateOne(
+  //           { _id: new ObjectId(order._id) },
+  //           { $set: { status: 'WaitingReview' } }
+  //         );
+  //       }
+
+  //     }
+
+  //   }
+
+  //   res.json(orders);
   try {
-    const cursor = OrderCollection.find({
-      $or: [
-        { status: "WaitingReview" },
-        { status: "OnHold" },
-        { status: "making" },
-        { status: "ReadyToShip" },
-        { status: "Shipped" },
-      ],
-    }).skip(parseInt(skip)).limit(parseInt(limit));
+    const { type, limit = 10, page = 1 } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
 
-    const orders = await cursor.sort({ _id: -1 }).toArray();
+    const pipeline = [
+      {
+        $match: {
+          $or: [
+            { status: "WaitingReview" },
+            { status: "OnHold" },
+            { status: "making" },
+            { status: "ReadyToShip" },
+            { status: "Shipped" },
+          ],
+        },
+      },
+      {
+        $sort: { _id: -1 },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: parseInt(limit),
+      },
+      {
+        $lookup: {
+          from: "customProductions", // Replace with your collection name
+          localField: "cart.1.customMade.productionId",
+          foreignField: "_id",
+          as: "customProductions",
+        },
+      },
+      {
+        $addFields: {
+          customProductions: {
+            $filter: {
+              input: "$customProductions",
+              as: "production",
+              cond: {
+                $in: ["$$production.status", ["success", "making", "pending", "reject"]],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          successStatusCount: {
+            $size: {
+              $filter: {
+                input: "$customProductions",
+                as: "production",
+                cond: { $eq: ["$$production.status", "success"] },
+              },
+            },
+          },
+          makingStatusCount: {
+            $size: {
+              $filter: {
+                input: "$customProductions",
+                as: "production",
+                cond: {
+                  $in: ["$$production.status", ["making", "pending", "reject"]],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          status: {
+            $cond: {
+              if: { $eq: ["$customProductions.length", "$successStatusCount"] },
+              then: "ReadyToShip",
+              else: {
+                $cond: {
+                  if: { $eq: ["$customProductions.length", "$makingStatusCount"] },
+                  then: "making",
+                  else: "WaitingReview",
+                },
+              },
+            },
+          },
+        },
+      },
+    ];
 
-    if (type === 'test') {
-      return res.json(orders);
-    }
+    const orders = await OrderCollection.aggregate(pipeline).toArray();
 
-    for (const order of orders) {
-      const customMade = order?.cart[1]?.customMade;
-      console.log('customMade', customMade);
-
-      if (customMade) {
-        let production = [];
-
-        for (const item of customMade) {
-          if (item?.productionId) {
-            const productionStatus = await customProductions.findOne({
-              _id: new ObjectId(item?.productionId),
-            });
-
-            production.push(productionStatus);
-          }
-        }
-
-
-        const successStatus = production.filter(
-          (item) => item?.status === 'success'
-        );
-
-        const makingStatus = production.filter(
-          (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
-        );
-
-
-        if (customMade.length === successStatus.length) {
-          await OrderCollection.updateOne(
-            { _id: new ObjectId(order._id) },
-            { $set: { status: 'ReadyToShip' } }
-          );
-        }
-
-        if (customMade.length === makingStatus.length) {
-          await OrderCollection.updateOne(
-            { _id: new ObjectId(order._id) },
-            { $set: { status: 'making' } }
-          );
-        }
-
-        if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
-          await OrderCollection.updateOne(
-            { _id: new ObjectId(order._id) },
-            { $set: { status: 'WaitingReview' } }
-          );
-        }
-
-      }
-
-    }
-
-    res.json(orders);
+    res.json({ totalOrders: await OrderCollection.countDocuments(), orders});
   } catch (error) {
     console.log('error', 'order fetch failed');
     res.status(403).send('something went wrong!')
@@ -164,23 +260,21 @@ const getReadyToShipProduct = async (req, res) => {
 
     // Fetch details for readyMade products and category
     // await Promise.all(
-      
+
     //   );
-      
-      const readyMade = [];
-      await Promise.all(readyMadeProducts.map(async (item) => {
-        const product = await productCollection.findOne({ _id: new ObjectId(item.productId) });
-        const category = await productCategory.findOne({ _id: new ObjectId(product?.category) });
-        if (product && category) {
-          readyMade.push({ ...product, productSize: item.productSize, category: category.category });
-        }
-      }));
+
+    const readyMade = [];
+    await Promise.all(readyMadeProducts.map(async (item) => {
+      const product = await productCollection.findOne({ _id: new ObjectId(item.productId) });
+      const category = await productCategory.findOne({ _id: new ObjectId(product?.category) });
+      if (product && category) {
+        readyMade.push({ ...product, productSize: item.productSize, category: category.category });
+      }
+    }));
 
 
     // Combine readyMade and customMade products into a single array
     const allProducts = [...readyMade, ...customMadeProducts];
-
-    console.log(customMadeProducts)
 
     // Create a response object with orders and products
     const response = { orders: products[0], products: allProducts };
@@ -220,16 +314,12 @@ const createOrder = async (req, res) => {
     receivedData.invoiceID = lastOrder[0]?.invoiceID + 1
 
     for (const product of receivedData?.cart[0]?.readyMade) {
-      console.log(product)
       await productCollection.updateOne(
         { _id: new ObjectId(product.productId) },
         { $inc: { [`size.${product.productSize}`]: -1 } }
       );
     }
-
-    // console.log(receivedData);
     const order = await OrderCollection.insertOne(receivedData);
-    console.log(order);
     // return res.send('just testing')
     // Send a response back to the client
     res.status(200).json(order);
