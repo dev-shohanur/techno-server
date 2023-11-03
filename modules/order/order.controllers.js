@@ -15,7 +15,7 @@ const getAllOrder = async (req, res) => {
         { status: "ReadyToShip" },
         { status: "Shipped" },
       ],
-    }).limit(limit);
+    }).limit(parseInt(limit));
 
     const orders = await cursor.sort({ _id: -1 }).toArray();
 
