@@ -171,57 +171,59 @@ const getAllOrder = async (req, res) => {
 
     const orders = await OrderCollection.aggregate(pipeline).toArray();
 
-    for (const order of orders) {
-      const customMade = order?.cart[1]?.customMade;
-      console.log('customMade', customMade);
+    console.log(orders)
 
-      if (customMade) {
-        let production = [];
+    // for (const order of orders) {
+    //   const customMade = order?.cart[1]?.customMade;
+    //   console.log('customMade', customMade);
 
-        for (const item of customMade) {
-          if (item?.productionId) {
-            const productionStatus = await customProductions.findOne({
-              _id: new ObjectId(item?.productionId),
-            });
+    //   if (customMade) {
+    //     let production = [];
 
-            production.push(productionStatus);
-          }
-        }
+    //     for (const item of customMade) {
+    //       if (item?.productionId) {
+    //         const productionStatus = await customProductions.findOne({
+    //           _id: new ObjectId(item?.productionId),
+    //         });
 
-
-        const successStatus = production.filter(
-          (item) => item?.status === 'success'
-        );
-
-        const makingStatus = production.filter(
-          (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
-        );
+    //         production.push(productionStatus);
+    //       }
+    //     }
 
 
-        if (customMade.length === successStatus.length) {
-          await OrderCollection.updateOne(
-            { _id: new ObjectId(order._id) },
-            { $set: { status: 'ReadyToShip' } }
-          );
-        }
+    //     const successStatus = production.filter(
+    //       (item) => item?.status === 'success'
+    //     );
 
-        if (customMade.length === makingStatus.length) {
-          await OrderCollection.updateOne(
-            { _id: new ObjectId(order._id) },
-            { $set: { status: 'making' } }
-          );
-        }
+    //     const makingStatus = production.filter(
+    //       (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
+    //     );
 
-        if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
-          await OrderCollection.updateOne(
-            { _id: new ObjectId(order._id) },
-            { $set: { status: 'WaitingReview' } }
-          );
-        }
-      }
 
-      res.json({ totalOrders: await OrderCollection.countDocuments(), orders });
-    }
+    //     if (customMade.length === successStatus.length) {
+    //       await OrderCollection.updateOne(
+    //         { _id: new ObjectId(order._id) },
+    //         { $set: { status: 'ReadyToShip' } }
+    //       );
+    //     }
+
+    //     if (customMade.length === makingStatus.length) {
+    //       await OrderCollection.updateOne(
+    //         { _id: new ObjectId(order._id) },
+    //         { $set: { status: 'making' } }
+    //       );
+    //     }
+
+    //     if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
+    //       await OrderCollection.updateOne(
+    //         { _id: new ObjectId(order._id) },
+    //         { $set: { status: 'WaitingReview' } }
+    //       );
+    //     }
+    //   }
+
+    // }
+    res.json({ totalOrders: await OrderCollection.countDocuments(), orders });
   } catch (error) {
     console.log('error', 'order fetch failed');
     res.status(403).send('something went wrong!')
