@@ -6,80 +6,6 @@ var Promise = require("promise");
 
 const getAllOrder = async (req, res) => {
 
-
-  // try {
-  //   const { type, limit = 10, page = 1 } = req.query;
-  //   let skip = 0
-  //   skip = (Number(page) - 1) * Number(limit)
-  //   console.log(limit,page,skip)
-  //   const cursor = OrderCollection.find({
-  //     $or: [
-  //       { status: "WaitingReview" },
-  //       { status: "OnHold" },
-  //       { status: "making" },
-  //       { status: "ReadyToShip" },
-  //       { status: "Shipped" },
-  //     ],
-  //   }).skip(parseInt(skip)).limit(parseInt(limit));
-
-
-
-
-  //   const orders = await cursor.sort({ _id: -1 }).toArray();
-
-  //   for (const order of orders) {
-  //     const customMade = order?.cart[1]?.customMade;
-  //     console.log('customMade', customMade);
-
-  //     if (customMade) {
-  //       let production = [];
-
-  //       for (const item of customMade) {
-  //         if (item?.productionId) {
-  //           const productionStatus = await customProductions.findOne({
-  //             _id: new ObjectId(item?.productionId),
-  //           });
-
-  //           production.push(productionStatus);
-  //         }
-  //       }
-
-
-  //       const successStatus = production.filter(
-  //         (item) => item?.status === 'success'
-  //       );
-
-  //       const makingStatus = production.filter(
-  //         (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
-  //       );
-
-
-  //       if (customMade.length === successStatus.length) {
-  //         await OrderCollection.updateOne(
-  //           { _id: new ObjectId(order._id) },
-  //           { $set: { status: 'ReadyToShip' } }
-  //         );
-  //       }
-
-  //       if (customMade.length === makingStatus.length) {
-  //         await OrderCollection.updateOne(
-  //           { _id: new ObjectId(order._id) },
-  //           { $set: { status: 'making' } }
-  //         );
-  //       }
-
-  //       if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
-  //         await OrderCollection.updateOne(
-  //           { _id: new ObjectId(order._id) },
-  //           { $set: { status: 'WaitingReview' } }
-  //         );
-  //       }
-
-  //     }
-
-  //   }
-
-  //   res.json(orders);
   try {
     const { type, limit = 10, page = 1 } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
@@ -112,66 +38,10 @@ const getAllOrder = async (req, res) => {
           foreignField: "_id",
           as: "customProductions",
         },
-      },
-      {
-        $addFields: {
-          customProductions: {
-            $filter: {
-              input: "$customProductions",
-              as: "production",
-              cond: {
-                $in: ["$$production.status", ["success", "making", "pending", "reject"]],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
-          successStatusCount: {
-            $size: {
-              $filter: {
-                input: "$customProductions",
-                as: "production",
-                cond: { $eq: ["$$production.status", "success"] },
-              },
-            },
-          },
-          makingStatusCount: {
-            $size: {
-              $filter: {
-                input: "$customProductions",
-                as: "production",
-                cond: {
-                  $in: ["$$production.status", ["making", "pending", "reject"]],
-                },
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
-          status: {
-            $cond: {
-              if: { $eq: ["$customProductions.length", "$successStatusCount"] },
-              then: "ReadyToShip",
-              else: {
-                $cond: {
-                  if: { $eq: ["$customProductions.length", "$makingStatusCount"] },
-                  then: "making",
-                  else: "WaitingReview",
-                },
-              },
-            },
-          },
-        },
-      },
+      }
     ];
 
     const orders = await OrderCollection.aggregate(pipeline).toArray();
-
-    console.log(orders)
 
     // for (const order of orders) {
     //   const customMade = order?.cart[1]?.customMade;

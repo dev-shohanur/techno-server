@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { productions, productionCategory, customProductions } = require("../../index.js");
+const { productions, productionCategory, customProductions, OrderCollection } = require("../../index.js");
 
 
 
@@ -65,16 +65,47 @@ const getTaskByTailorId = async (req, res) => {
   res.send(production);
 };
 
-const updateCustomProductionStatus = (req, res) => {
+const updateCustomProductionStatus = async (req, res) => {
   try {
     const id = req.params.id;
-    const status = req.body.status;
+    const status = req.body;
 
-    customProductions.updateOne(
+   await customProductions.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { status: status } }
+     { $set: { status: status.status } }
     );
-    res.status(200).send("Updated");
+
+    const production = await customProductions.findOne({ _id: new ObjectId(id) })
+
+    const order = await OrderCollection.findOne({ _id: new ObjectId(production?.orderId) })
+    
+    let productions = []
+    order.cart[1].customMade.map(async(product) => {
+      productions = [await customProductions.findOne({ _id: new ObjectId(product.productionId) }), ...productions]
+
+    })
+
+    const success = productions.filter((item) => item.status === 'success')
+    const making = productions.filter((item) => item.status === 'making' || item.status === 'reject' || item.status === 'pending')
+
+    if (order.cart[1].customMade.length === success.length) {
+     await OrderCollection.updateOne(
+       { _id: new ObjectId(order._id) },
+       { $set: { status: "ReadyToShip" } }
+      );
+    } else if (order.cart[1].customMade.length === making.length) {
+      await OrderCollection.updateOne(
+        { _id: new ObjectId(order._id) },
+        { $set: { status: "making" } }
+      );
+    } else {
+      await OrderCollection.updateOne(
+        { _id: new ObjectId(order._id) },
+        { $set: { status: "WaitingReview" } }
+      );
+    }
+
+    res.status(200).send({success: true});
   } catch (error) {
     console.log(error)
     res.status(204).send(error);
