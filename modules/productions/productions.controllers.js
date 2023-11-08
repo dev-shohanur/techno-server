@@ -98,6 +98,11 @@ const updateCustomProductionStatus = async (req, res) => {
         { _id: new ObjectId(order._id) },
         { $set: { status: "making" } }
       );
+    } else if (order.cart[1].customMade.length === 0 && order.cart[0].readyMade.length > 0) {
+      await OrderCollection.updateOne(
+        { _id: new ObjectId(order._id) },
+        { $set: { status: "ReadyToShip" } }
+      );
     } else {
       await OrderCollection.updateOne(
         { _id: new ObjectId(order._id) },
