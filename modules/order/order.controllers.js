@@ -112,15 +112,25 @@ const getAllDefaultSize = async (req, res) => {
 const getReadyToShipProduct = async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 1;
-  const search = req.query.search || 0;
+  const search = Number(req.query.search) || null;
   let skip = 0;
   skip = (page - 1) * limit;
+
+  let invoiceId = {}
+
+  if (search !== null) {
+    invoiceId = {$and: [
+      { invoiceID: search }, // Matching orders with status "ReadyToShip"
+      { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } },// Matching orders with status "ReadyToShip"
+    ]}
+  }
 
   let products = await OrderCollection.aggregate([
     {
       $match: {
+        ...invoiceId,
         $or: [
-          { status: { $regex: "ReadyToShip" } } // Matching orders with status "ReadyToShip"
+          { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } } ,// Matching orders with status "ReadyToShip"
         ]
       }
     },
@@ -201,7 +211,7 @@ const getReadyToShipProduct = async (req, res) => {
     // Create a response object with orders and products
     const response = { orders: products[0], products: allProducts };
 
-    res.status(200).json(response);
+    res.status(200).json(products[0]);
   } else {
     res.status(200).json({
       success: false
