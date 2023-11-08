@@ -211,7 +211,7 @@ const getReadyToShipProduct = async (req, res) => {
     // Create a response object with orders and products
     const response = { orders: products[0], products: allProducts };
 
-    res.status(200).json(products[0]);
+    res.status(200).json(response);
   } else {
     res.status(200).json({
       success: false
