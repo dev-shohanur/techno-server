@@ -88,7 +88,6 @@ const getProducts = async (req, res) => {
    skip = (page - 1) * limit
 
 
-  console.log(skip)
 
   let categoryFilter = {};
   if (category) {
@@ -206,8 +205,6 @@ const decreaseProductStock = async (req, res) => {
       );
 
       res.status(200).json({ success: true });
-
-      console.log(`${result.modifiedCount} document updated for product with ID: ${product._id}`);
     }
   } catch (error) {
     res.status(500).json({success: false,})
@@ -219,7 +216,6 @@ const decreaseProductStock = async (req, res) => {
 const addProductStock = async (req, res) => {
   const  cart  = req.body;
 
-  console.log(cart);
 
   try {
     for (const product of cart) {
@@ -230,7 +226,6 @@ const addProductStock = async (req, res) => {
 
       res.status(200).json({ success: true });
 
-      console.log(`${result.modifiedCount} document updated for product with ID: ${product._id}`);
     }
   } catch (error) {
     res.status(500).json({

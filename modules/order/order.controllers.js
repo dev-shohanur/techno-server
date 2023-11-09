@@ -43,45 +43,49 @@ const getAllOrder = async (req, res) => {
 
     const orders = await OrderCollection.aggregate(pipeline).toArray();
 
-   for (const order of orders) {
+
+    for (const order of orders) {
       const customMade = order?.cart[1]?.customMade;
-     console.log('customMade', customMade);
+
+      let productions = []
+      await Promise.all(
+        order?.cart[1]?.customMade.map(async (product) => {
+          if (product?.productionId) {
+            const production = await customProductions.findOne({ _id: new ObjectId(product?.productionId) });
+            productions = [production, ...productions]
+            //  }
+
+          }
+        })
+      )
 
 
-     let productions = []
-     await Promise.all(
-       order.cart[1].customMade.map(async (product) => {
-         productions = [await customProductions.findOne({ _id: new ObjectId(product.productionId) }), ...productions]
+      const success = productions?.filter((item) => item?.status === 'success')
+      const making = productions?.filter((item) => item?.status === 'making' || item?.status === 'reject' || item?.status === 'pending')
 
-       })
-     )
+      if (order?.cart[1]?.customMade?.length === success?.length) {
+        await OrderCollection.updateOne(
+          { _id: new ObjectId(order._id) },
+          { $set: { status: "ReadyToShip" } }
+        );
+      } else if (order?.cart[1]?.customMade?.length === making?.length) {
+        await OrderCollection.updateOne(
+          { _id: new ObjectId(order._id) },
+          { $set: { status: "making" } }
+        );
+      } else if (order?.cart[1]?.customMade?.length === 0 && order?.cart[0]?.readyMade?.length > 0) {
+        await OrderCollection.updateOne(
+          { _id: new ObjectId(order._id) },
+          { $set: { status: "ReadyToShip" } }
+        );
+      } else {
+        await OrderCollection.updateOne(
+          { _id: new ObjectId(order._id) },
+          { $set: { status: "WaitingReview" } }
+        );
+      }
 
-     const success = productions.filter((item) => item.status === 'success')
-     const making = productions.filter((item) => item.status === 'making' || item.status === 'reject' || item.status === 'pending')
-
-     if (order.cart[1].customMade.length === success.length) {
-       await OrderCollection.updateOne(
-         { _id: new ObjectId(order._id) },
-         { $set: { status: "ReadyToShip" } }
-       );
-     } else if (order.cart[1].customMade.length === making.length) {
-       await OrderCollection.updateOne(
-         { _id: new ObjectId(order._id) },
-         { $set: { status: "making" } }
-       );
-     } else if (order.cart[1].customMade.length === 0 && order.cart[0].readyMade.length > 0) {
-       await OrderCollection.updateOne(
-         { _id: new ObjectId(order._id) },
-         { $set: { status: "ReadyToShip" } }
-       );
-     } else {
-       await OrderCollection.updateOne(
-         { _id: new ObjectId(order._id) },
-         { $set: { status: "WaitingReview" } }
-       );
-     }
-
-     }
+    }
     res.json({ totalOrders: await OrderCollection.countDocuments(), orders });
   } catch (error) {
     console.log('error', 'order fetch failed');
@@ -108,10 +112,12 @@ const getReadyToShipProduct = async (req, res) => {
   let invoiceId = {}
 
   if (search !== null) {
-    invoiceId = {$and: [
-      { invoiceID: search }, // Matching orders with status "ReadyToShip"
-      { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } },// Matching orders with status "ReadyToShip"
-    ]}
+    invoiceId = {
+      $and: [
+        { invoiceID: search }, // Matching orders with status "ReadyToShip"
+        { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } },// Matching orders with status "ReadyToShip"
+      ]
+    }
   }
 
   let products = await OrderCollection.aggregate([
@@ -119,7 +125,7 @@ const getReadyToShipProduct = async (req, res) => {
       $match: {
         ...invoiceId,
         $or: [
-          { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } } ,// Matching orders with status "ReadyToShip"
+          { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } },// Matching orders with status "ReadyToShip"
         ]
       }
     },
@@ -230,7 +236,6 @@ const createOrder = async (req, res) => {
 
 
     const lastOrder = await OrderCollection.find({}).sort({ _id: -1 }).limit(1).toArray();
-    console.log(receivedData.invoiceID, lastOrder[0]?.invoiceID + 1)
 
     receivedData.invoiceID = lastOrder[0]?.invoiceID + 1
 

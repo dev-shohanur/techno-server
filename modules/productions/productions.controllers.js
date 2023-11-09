@@ -6,9 +6,6 @@ const { Promise } = require("mongoose");
 
 
 const getCategory = async (req, res) => {
-
-  // console.log("shohan")
-
   const category = await productionCategory.find({}).toArray();
 
   res.status(200).json(category);
@@ -41,12 +38,8 @@ const createCustomProduction = async (req, res) => {
 const getCustomProductionById = async (req, res) => {
 
   const { id } = req.params
-  
-  console.log(id)
 
   const production = await customProductions.findOne({ _id: new ObjectId(id) });
-
-  console.log(production)
 
   
   res.status(200).json(production);
@@ -62,7 +55,6 @@ const getTaskByTailorId = async (req, res) => {
 
   const id = req.params.id
   const production = await customProductions.find({ tailorId: id }).sort({ _id: -1 }).toArray();
-  console.log(production)
   res.send(production);
 };
 
@@ -198,8 +190,6 @@ const getThisWeekProduction = async (req, res) => {
 
 
   let tailorId = req.query.tailorId || '';
-
-  console.log(tailorId)
 
 
   const dateFilter = {};
