@@ -1,5 +1,6 @@
 const { ObjectId } = require("mongodb");
 const { productions, productionCategory, customProductions, OrderCollection } = require("../../index.js");
+const { Promise } = require("mongoose");
 
 
 
@@ -80,10 +81,12 @@ const updateCustomProductionStatus = async (req, res) => {
     const order = await OrderCollection.findOne({ _id: new ObjectId(production?.orderId) })
     
     let productions = []
-    order.cart[1].customMade.map(async(product) => {
-      productions = [await customProductions.findOne({ _id: new ObjectId(product.productionId) }), ...productions]
+    await Promise.all(
+      order.cart[1].customMade.map(async (product) => {
+        productions = [await customProductions.findOne({ _id: new ObjectId(product.productionId) }), ...productions]
 
-    })
+      })
+    )
 
     const success = productions.filter((item) => item.status === 'success')
     const making = productions.filter((item) => item.status === 'making' || item.status === 'reject' || item.status === 'pending')
