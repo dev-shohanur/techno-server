@@ -43,56 +43,45 @@ const getAllOrder = async (req, res) => {
 
     const orders = await OrderCollection.aggregate(pipeline).toArray();
 
-    // for (const order of orders) {
-    //   const customMade = order?.cart[1]?.customMade;
-    //   console.log('customMade', customMade);
-
-    //   if (customMade) {
-    //     let production = [];
-
-    //     for (const item of customMade) {
-    //       if (item?.productionId) {
-    //         const productionStatus = await customProductions.findOne({
-    //           _id: new ObjectId(item?.productionId),
-    //         });
-
-    //         production.push(productionStatus);
-    //       }
-    //     }
+   for (const order of orders) {
+      const customMade = order?.cart[1]?.customMade;
+     console.log('customMade', customMade);
 
 
-    //     const successStatus = production.filter(
-    //       (item) => item?.status === 'success'
-    //     );
+     let productions = []
+     await Promise.all(
+       order.cart[1].customMade.map(async (product) => {
+         productions = [await customProductions.findOne({ _id: new ObjectId(product.productionId) }), ...productions]
 
-    //     const makingStatus = production.filter(
-    //       (item) => item?.status === 'making' || item?.status === 'pending' || item?.status === 'reject'
-    //     );
+       })
+     )
 
+     const success = productions.filter((item) => item.status === 'success')
+     const making = productions.filter((item) => item.status === 'making' || item.status === 'reject' || item.status === 'pending')
 
-    //     if (customMade.length === successStatus.length) {
-    //       await OrderCollection.updateOne(
-    //         { _id: new ObjectId(order._id) },
-    //         { $set: { status: 'ReadyToShip' } }
-    //       );
-    //     }
+     if (order.cart[1].customMade.length === success.length) {
+       await OrderCollection.updateOne(
+         { _id: new ObjectId(order._id) },
+         { $set: { status: "ReadyToShip" } }
+       );
+     } else if (order.cart[1].customMade.length === making.length) {
+       await OrderCollection.updateOne(
+         { _id: new ObjectId(order._id) },
+         { $set: { status: "making" } }
+       );
+     } else if (order.cart[1].customMade.length === 0 && order.cart[0].readyMade.length > 0) {
+       await OrderCollection.updateOne(
+         { _id: new ObjectId(order._id) },
+         { $set: { status: "ReadyToShip" } }
+       );
+     } else {
+       await OrderCollection.updateOne(
+         { _id: new ObjectId(order._id) },
+         { $set: { status: "WaitingReview" } }
+       );
+     }
 
-    //     if (customMade.length === makingStatus.length) {
-    //       await OrderCollection.updateOne(
-    //         { _id: new ObjectId(order._id) },
-    //         { $set: { status: 'making' } }
-    //       );
-    //     }
-
-    //     if (customMade.length > makingStatus.length && customMade.length > successStatus.length) {
-    //       await OrderCollection.updateOne(
-    //         { _id: new ObjectId(order._id) },
-    //         { $set: { status: 'WaitingReview' } }
-    //       );
-    //     }
-    //   }
-
-    // }
+     }
     res.json({ totalOrders: await OrderCollection.countDocuments(), orders });
   } catch (error) {
     console.log('error', 'order fetch failed');
