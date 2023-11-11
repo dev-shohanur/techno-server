@@ -10,6 +10,11 @@ const getCategory = async (req, res) => {
 
   res.status(200).json(category);
 }
+const getLastCustomProduction = async (req, res) => {
+  const production = await customProductions.find({}).sort({ _id: -1 }).limit(1).toArray();
+
+  res.status(200).json(production);
+}
 const getProductionById = async (req, res) => {
 
   const {id} = req.params
@@ -126,11 +131,15 @@ const createCategory = async (req, res) => {
 const updateRejectedText = async (req, res) => { 
   try {
     const id = req.params.id;
-    const rejectText = req.body.rejectText;
+    const rejectData = req.body;
 
     customProductions.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { rejectText: rejectText } },
+      {
+        $push: {
+          rejected: rejectData
+        }
+      },
       {new: true}
     );
     res.status(200).send("Updated");
@@ -342,5 +351,6 @@ module.exports = {
   getTaskByTailorId,
   updateCustomProductionStatus,
   getAllCustomProduction,
-  updateRejectedText
+  updateRejectedText,
+  getLastCustomProduction
 };

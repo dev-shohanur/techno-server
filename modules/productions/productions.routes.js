@@ -12,7 +12,8 @@ const {
   getTaskByTailorId,
   updateCustomProductionStatus,
   getAllCustomProduction,
-  updateRejectedText
+  updateRejectedText,
+  getLastCustomProduction
 } = require("./productions.controllers");
 const productionRoutes = express.Router();
 
@@ -24,6 +25,10 @@ productionRoutes.post("/", (req, res) => {
 productionRoutes.post("/custom-production", (req, res) => {
   createCustomProduction(req, res);
 });
+productionRoutes.get("/last/production", (req, res) => {
+  getLastCustomProduction(req, res);
+});
+
 productionRoutes.get("/custom-production", (req, res) => {
   getAllCustomProduction(req, res);
 });
