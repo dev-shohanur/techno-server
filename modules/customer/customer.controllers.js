@@ -35,8 +35,6 @@ const createCustomer = async (req, res) => {
     const { name, number, address } = req.body;
 
 
-    console.log(name, number, address)
-
     // Find the user in the database
     // return res.json({ user: req.body})
     const customer = await customerCollection.findOne({ number });
@@ -72,8 +70,6 @@ const getAllCustomer = async (req, res) => {
   const limit = Number(req.query.limit) || 5
   const search = req.query.search || '';
   const skip = (page - 1) * limit
-
-  console.log(search)
 
   try {
     let customer = await customerCollection.aggregate([

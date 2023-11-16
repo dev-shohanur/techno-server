@@ -12,8 +12,6 @@ const getAllSales = async (req, res) => {
         { invoiceID: search }
       ]}
     }
-
-    console.log(invoiceID)
       const page = Number(req.query.page) || 1
       const limit = Number(req.query.limit) || 5
 
@@ -152,7 +150,6 @@ const createReturnSale = async (req, res) => {
 const returnSale = async (req, res) => {
   const saleId = req.params.id;
 
-  console.log(saleId)
 
   await sales.deleteOne({ _id: new ObjectId(saleId) })
 

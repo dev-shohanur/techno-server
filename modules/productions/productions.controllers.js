@@ -121,7 +121,6 @@ const createCategory = async (req, res) => {
 
   const category = req.body;
 
-  console.log(category)
 
   await productionCategory.insertOne(category)
 
