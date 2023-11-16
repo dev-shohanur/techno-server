@@ -52,15 +52,10 @@ const getProductById = async (req, res) => {
   const id = req.params.id;
   const product = await productCollection.findOne({ _id: new ObjectId(id) });
 
-  const finalProduct = await customProductions.findOne({ _id: new ObjectId(product?.productionId) });
   // Send a response back to the client
 
 
-  if (finalProduct?.status === 'success') {
     res.status(200).json(product);
-  } else {
-    res.status(204).json("Invalid Product Code");
-  }
 };
 const getVoucherCodeById = async (req, res) => {
 
