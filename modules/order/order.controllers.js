@@ -214,12 +214,18 @@ const getReadyToShipProduct = async (req, res) => {
   }
 };
 
-const updateOrder = (req, res) => {
+const updateOrder = async (req, res) => {
   const id = req.params.id; // Extract the document ID from the request parameters
   const updateData = req.body; // Extract the updated data from the request body
 
+
+  if (updateData?.trackingId) {
+    OrderCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status: 'shipped' } })
+  }
+
+
   // Update the document in the collection
-  const result = OrderCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
+  const result = await OrderCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
     .then(() => {
       res.status(200).send(result); // Send a success status code if the update was successful
     })
