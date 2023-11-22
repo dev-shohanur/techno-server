@@ -219,9 +219,9 @@ const updateOrder = (req, res) => {
   const updateData = req.body; // Extract the updated data from the request body
 
   // Update the document in the collection
-  OrderCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
+  const result = OrderCollection.updateOne({ _id: new ObjectId(id) }, { $set: updateData })
     .then(() => {
-      res.sendStatus(200); // Send a success status code if the update was successful
+      res.status(200).send(result); // Send a success status code if the update was successful
     })
     .catch((error) => {
       console.error("Error updating document:", error);
