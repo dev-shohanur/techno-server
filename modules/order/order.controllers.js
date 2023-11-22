@@ -125,6 +125,7 @@ const getReadyToShipProduct = async (req, res) => {
       $match: {
         ...invoiceId,
         $or: [
+          { status: { $regex: ".*" + "ReadyToShip" + ".*", $options: "i" } },// Matching orders with status "ReadyToShip"
           { status: { $regex: ".*" + "shipped" + ".*", $options: "i" } },// Matching orders with status "ReadyToShip"
         ]
       }
