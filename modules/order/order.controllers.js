@@ -63,7 +63,7 @@ const getAllOrder = async (req, res) => {
       const success = productions?.filter((item) => item?.status === 'success')
       const making = productions?.filter((item) => item?.status === 'making' || item?.status === 'reject' || item?.status === 'pending')
 
-      if (order?.cart[1]?.customMade?.length === success?.length) {
+      if (order?.cart[1]?.customMade?.length === success?.length && !order?.trackingId) {
         await OrderCollection.updateOne(
           { _id: new ObjectId(order._id) },
           { $set: { status: "ReadyToShip" } }
