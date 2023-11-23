@@ -45,23 +45,24 @@ const getAllOrder = async (req, res) => {
 
 
     for (const order of orders) {
-      const customMade = order?.cart[1]?.customMade;
+      if (order?.status === "WaitingReview" || order?.status === "making") {
+        const customMade = order?.cart[1]?.customMade;
 
-      let productions = []
-      await Promise.all(
-        order?.cart[1]?.customMade.map(async (product) => {
-          if (product?.productionId) {
-            const production = await customProductions.findOne({ _id: new ObjectId(product?.productionId) });
-            productions = [production, ...productions]
-            //  }
+        let productions = []
+        await Promise.all(
+          order?.cart[1]?.customMade.map(async (product) => {
+            if (product?.productionId) {
+              const production = await customProductions.findOne({ _id: new ObjectId(product?.productionId) });
+              productions = [production, ...productions]
+              //  }
 
-          }
-        })
-      )
+            }
+          })
+        )
 
 
-      const success = productions?.filter((item) => item?.status === 'success')
-      const making = productions?.filter((item) => item?.status === 'making' || item?.status === 'reject' || item?.status === 'pending')
+        const success = productions?.filter((item) => item?.status === 'success')
+        const making = productions?.filter((item) => item?.status === 'making' || item?.status === 'reject' || item?.status === 'pending')
 
         console.log(order?.status)
         if (order?.cart[1]?.customMade?.length === success?.length && !order?.trackingId) {
@@ -86,6 +87,7 @@ const getAllOrder = async (req, res) => {
           );
         }
 
+      }
     }
     res.json({ totalOrders: await OrderCollection.countDocuments(), orders });
   } catch (error) {
