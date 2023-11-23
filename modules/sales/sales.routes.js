@@ -11,7 +11,6 @@ const {
   getLastSale,
   getCustomerBuy
 } = require("./sales.controllers");
-const verifyTokenMiddleware = require("../../verifyTokenMiddleware");
 const salesRoutes = express.Router();
 
 // Define the Sells routes
@@ -20,7 +19,7 @@ salesRoutes.get("/last", (req, res) => {
 });
 
 
-salesRoutes.get("/", verifyTokenMiddleware, (req, res) => {
+salesRoutes.get("/", (req, res) => {
   getAllSales(req, res);
 });
 salesRoutes.get("/return-sales", (req, res) => {
