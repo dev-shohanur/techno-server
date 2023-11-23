@@ -18,7 +18,7 @@ const getAllOrder = async (req, res) => {
             { status: "OnHold" },
             { status: "making" },
             { status: "ReadyToShip" },
-            { status: "Shipped" },
+            { status: "shipped" },
           ],
         },
       },
@@ -126,7 +126,7 @@ const getReadyToShipProduct = async (req, res) => {
         ...invoiceId,
         $or: [
           { status: "ReadyToShip" },
-          { status: "Shipped" },
+          { status: "shipped" },
         ]
       }
     },
