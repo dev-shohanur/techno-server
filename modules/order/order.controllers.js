@@ -128,8 +128,7 @@ const getReadyToShipProduct = async (req, res) => {
       $match: {
         ...invoiceId,
         $or: [
-          { status: "ReadyToShip" },
-          { status: "shipped" },
+          { status: "ReadyToShip" }
         ]
       }
     },
