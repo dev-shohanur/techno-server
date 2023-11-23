@@ -63,26 +63,28 @@ const getAllOrder = async (req, res) => {
       const success = productions?.filter((item) => item?.status === 'success')
       const making = productions?.filter((item) => item?.status === 'making' || item?.status === 'reject' || item?.status === 'pending')
 
-      if (order?.cart[1]?.customMade?.length === success?.length && !order?.trackingId) {
-        await OrderCollection.updateOne(
-          { _id: new ObjectId(order._id) },
-          { $set: { status: "ReadyToShip" } }
-        );
-      } else if (order?.cart[1]?.customMade?.length === making?.length) {
-        await OrderCollection.updateOne(
-          { _id: new ObjectId(order._id) },
-          { $set: { status: "making" } }
-        );
-      } else if (order?.cart[1]?.customMade?.length === 0 && order?.cart[0]?.readyMade?.length > 0) {
-        await OrderCollection.updateOne(
-          { _id: new ObjectId(order._id) },
-          { $set: { status: "ReadyToShip" } }
-        );
-      } else {
-        await OrderCollection.updateOne(
-          { _id: new ObjectId(order._id) },
-          { $set: { status: "WaitingReview" } }
-        );
+      if (order?.status !== 'ReadyToShip') {
+        if (order?.cart[1]?.customMade?.length === success?.length && !order?.trackingId) {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: "ReadyToShip" } }
+          );
+        } else if (order?.cart[1]?.customMade?.length === making?.length) {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: "making" } }
+          );
+        } else if (order?.cart[1]?.customMade?.length === 0 && order?.cart[0]?.readyMade?.length > 0) {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: "ReadyToShip" } }
+          );
+        } else {
+          await OrderCollection.updateOne(
+            { _id: new ObjectId(order._id) },
+            { $set: { status: "WaitingReview" } }
+          );
+        }
       }
 
     }
