@@ -9,7 +9,7 @@ const createExpense = async (req, res) => {
   const expense = req.body;
 
   await expenseCollection.insertOne(expense);
-  
+
   // Send a response back to the client
   res.json({ message: "Data received successfully" });
 };
@@ -22,25 +22,31 @@ const getAllExpense = async (req, res) => {
   let endDate = req.query.endDate || ''; // Replace with the desired end date
   let category = req.query.category || ''; // Replace with the desired end date
 
-  if (startDate === endDate) {
-    startDate = '';
-    endDate = '';
+  if (startDate === new Date() && endDate === new Date()) {
+    startDate = ''
+    endDate = ''
   }
 
   const skip = (page - 1) * limit
-
   const dateFilter = {};
-  if (startDate === endDate && startDate !== '' && endDate !== '') {
-    dateFilter.date = { $match: startDate };
-  } else if ((Number(startDate?.split(" ")[2]) - Number(endDate?.split(" ")[2])) === 1) {
-    dateFilter.date = { $match: startDate, $match: endDate };;
-  } else {
-    dateFilter.date = { $gte: startDate-1, $lte: endDate+1 }
+  if (startDate !== '' && endDate !== '') {
+
+    const inputStartDate = new Date(startDate.split(" ")[0]);
+    const inputEndDate = new Date(endDate.split(" ")[0]);
+    const nextDay = new Date(inputStartDate);
+    const prevDay = new Date(inputEndDate);
+    nextDay.setDate(inputStartDate.getDate() - 0);
+    prevDay.setDate(inputEndDate.getDate() + 0);
+    dateFilter.date = {
+      $gte: `${nextDay.getFullYear()}-${(nextDay.getMonth() + 1).toString().padStart(2, '0')}-${nextDay.getDate().toString().padStart(2, '0')}`,
+      $lte: `${prevDay.getFullYear()}-${(prevDay.getMonth() + 1).toString().padStart(2, '0')}-${prevDay.getDate().toString().padStart(2, '0')}`
+    };
   }
 
-  let categoryFilter = { };
+
+  let categoryFilter = {};
   if (category) {
-    categoryFilter = {category}
+    categoryFilter = { category }
   }
 
 
@@ -101,16 +107,16 @@ const getAllExpense = async (req, res) => {
 
   // await expenses
 
-  
+
   // Send a response back to the client
   if (expenses.length) {
-    res.status(200).json({expenses: expenses[0]} );
-    
+    res.status(200).json({ expenses: expenses[0] });
+
   } else {
     res.status(200).json({
       success: false
-    } );
-    
+    });
+
   }
 };
 
@@ -137,7 +143,7 @@ const getExpenseBySearch = async (req, res) => {
     ],
   }).skip(skip).limit(limit).toArray();
   // Send a response back to the client
- res.status(200).json({ expenses });
+  res.status(200).json({ expenses });
 };
 
 const getExpenses = async (req, res) => {
