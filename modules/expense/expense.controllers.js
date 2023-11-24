@@ -30,7 +30,9 @@ const getAllExpense = async (req, res) => {
   const skip = (page - 1) * limit
 
   const dateFilter = {};
-  if (startDate && endDate) {
+  if (startDate === endDate && startDate !== '' && endDate !== '') {
+    dateFilter.date = { $match: startDate };
+  } else if (startDate && endDate) {
     dateFilter.date = { $gte: startDate, $lte: endDate };
   }
 
