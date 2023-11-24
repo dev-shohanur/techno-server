@@ -31,9 +31,11 @@ const getAllExpense = async (req, res) => {
 
   const dateFilter = {};
   if (startDate === endDate && startDate !== '' && endDate !== '') {
-    dateFilter.date = { $match: startDate };
-  } else if (startDate && endDate) {
-    dateFilter.date = { $gte: startDate, $lte: endDate };
+    dateFilter.date = { $match: startDate, $match: endDate };
+  } else if (Number(startDate?.split(" ")[2]) - Number(endDate?.split(" ")[2]) === 1) {
+    dateFilter.date = { $match: startDate, $match: endDate };;
+  } else {
+    dateFilter.date = { $gte: startDate, $lte: endDate }
   }
 
   let categoryFilter = { };
