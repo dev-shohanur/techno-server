@@ -1,54 +1,29 @@
 const express = require("express");
-const {
-  createProduct, getProducts, getCategory, getProductById, updateProductById, updateProductStock, getVoucherCodeById, getCategoryById, productByProductCode, decreaseProductStock, addProductStock, updateProductionId
-} = require("./product.controllers");
+const { getAllProduct, addNewProduct, updateProduct, deleteProduct, updateProductShow, getProductsForUser, getAProducts } = require("./product.controllers.js");
 const productRoutes = express.Router();
 
-// Define the Sells routes
-
-productRoutes.post("/", (req, res) => {
-  createProduct(req, res);
-});
+// Define the user routes
 
 productRoutes.get("/", (req, res) => {
-  getProducts(req, res);
+  getAllProduct(req, res);
 });
-
-productRoutes.put("/stock-decrease", (req, res) => {
-  decreaseProductStock(req, res);
+productRoutes.get("/:id", (req, res) => {
+  getAProducts(req, res);
 });
-productRoutes.put("/update/production/:id", (req, res) => {
-  updateProductionId(req, res);
+productRoutes.get("/products", (req, res) => {
+  getProductsForUser(req, res);
 });
-productRoutes.put("/stock-add", (req, res) => {
-  addProductStock(req, res);
-});
-
-productRoutes.get("/:code", (req, res) => {
-  productByProductCode(req, res);
-});
-
-productRoutes.get("/category/category", (req, res) => {
-  getCategory(req, res);
-});
-
-productRoutes.get("/category/:id", (req, res) => {
-  getCategoryById(req, res);
+productRoutes.post("/", (req, res) => {
+  addNewProduct(req, res);
 });
 productRoutes.put("/:id", (req, res) => {
-  updateProductById(req, res);
+  updateProduct(req, res);
 });
-productRoutes.put("/stock/:id", (req, res) => {
-  updateProductStock(req, res);
+productRoutes.put("/show/:id", (req, res) => {
+  updateProductShow(req, res);
 });
-
-productRoutes.get("/product/:id", (req, res) => {
-  getProductById(req, res);
+productRoutes.delete("/:id", (req, res) => {
+  deleteProduct(req, res);
 });
-productRoutes.get("/code/:code", (req, res) => {
-  getVoucherCodeById(req, res);
-});
-
-
 
 module.exports = productRoutes;

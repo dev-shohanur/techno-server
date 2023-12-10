@@ -1,27 +1,33 @@
 const { ObjectId } = require("mongodb");
-const { userCollection } = require("../../index.js");
+const { users } = require("../../index.js");
 const jwt = require("jsonwebtoken");
 
 // Log in an existing user
 
 
 const getAllUser = async (req, res) => {
-  const user = await userCollection.find({}).toArray();
+  const user = await users.find({}).toArray();
 
   res.status(200).json(user);
 }
 const getAllTailor = async (req, res) => {
-  const user = await userCollection.find({ role: "tailor"}).toArray();
+  const user = await users.find({ role: "tailor" }).toArray();
 
   res.status(200).json(user);
 }
 const getUserById = async (req, res) => {
 
   const id = req.params.id
+  console.error(id)
+  if (id) {
 
-  const user = await userCollection.findOne({_id: new ObjectId(id)});
+    const user = await users.findOne({ _id: new ObjectId(id) });
 
-  res.status(200).json(user);
+    return res.status(200).json(user);
+  } else {
+    return res.status(401).json("error");
+  }
+
 }
 
 
@@ -31,7 +37,7 @@ const loginUserMyApp = async (req, res) => {
     const { email, password } = req.body;
 
     // Find the user in the database
-    const user = await userCollection.findOne({ email });
+    const user = await users.findOne({ email });
 
     if (!user) {
       return res.status(401).json({ error: "Invalid username or password" });

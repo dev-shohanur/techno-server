@@ -24,8 +24,7 @@ const corsConfig = {
 app.use(cors(corsConfig));
 app.options("", cors(corsConfig));
 
-const uri =
-  "mongodb+srv://dbUser:ASd2C66WzvIp0e9r@fristusemongodb.yjaddi5.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://shohanur:SiNRSxd1HZHIyhJ8@cluster0.yichpba.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -40,73 +39,27 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
 
-    const OrderCollection = client.db("Platinumys").collection("All Orders");
-    const userCollection = client.db("Platinumys").collection("userCollection");
-    const sellsCollection = client
-      .db("Platinumys")
-      .collection("sellsCollection");
-    const customerCollection = client
-      .db("Platinumys")
-      .collection("customerCollection");
-    const officeOrderCollection = client
-      .db("Platinumys")
-      .collection("OrderFromOffice");
-    const expenseCollection = client.db("Platinumys").collection("expenseCollection");
-    const salaryCollection = client.db("Platinumys").collection("salaryCollection");
-    const productCollection = client.db("Platinumys").collection("productCollection");
-    const productCategory = client.db("Platinumys").collection("productCategory");
-    const voucherCodes = client.db("Platinumys").collection("voucherCodes");
-    const sales = client.db("Platinumys").collection("sales");
-    const salesReturns = client.db("Platinumys").collection("salesReturns");
-    const productions = client.db("Platinumys").collection("productions");
-    const customProductions = client.db("Platinumys").collection("customProductions");
-    const productionCategory = client.db("Platinumys").collection("productionCategory");
-    const defaultSize = client.db("Platinumys").collection("defaultSizes");
+    const categorys = client.db("techno-iwasa").collection("categorys");
+    const users = client.db("techno-iwasa").collection("users");
+    const products = client.db("techno-iwasa").collection("products");
 
     // Middleware for parsing JSON data
     app.use(express.json());
 
     //Export Collection
     module.exports = {
-      OrderCollection,
-      defaultSize,
-      userCollection,
-      officeOrderCollection,
-      customerCollection,
-      sellsCollection,
-      expenseCollection,
-      salaryCollection,
-      productCollection,
-      productCategory,
-      voucherCodes,
-      sales,
-      salesReturns,
-      productions,
-      productionCategory,
-      customProductions
+      categorys,
+      users,
+      products
     };
 
     // Routes
     const userRoutes = require("./modules/users/user.routes");
     app.use("/user", userRoutes);
-
-    const orderRoutes = require("./modules/order/order.routes");
-    app.use("/order", orderRoutes);
-
-    const officeOrderRoutes = require("./modules/officeOrder/officeOrder.routes");
-    app.use("/office-order", officeOrderRoutes);
-    const customerRoutes = require("./modules/customer/customer.routes");
-    app.use("/customer", customerRoutes);
-    const salesRoutes = require("./modules/sales/sales.routes");
-    app.use("/sales", salesRoutes);
-    const expenseRoutes = require("./modules/expense/expense.routes");
-    app.use("/expense", expenseRoutes);
-    const salaryRoutes = require("./modules/salary/salary.routes");
-    app.use("/salary", salaryRoutes);
+    const categoryRoutes = require("./modules/category/category.routes");
+    app.use("/category", categoryRoutes);
     const productRoutes = require("./modules/product/product.routes");
     app.use("/product", productRoutes);
-    const productionRoutes = require("./modules/productions/productions.routes");
-    app.use("/production", productionRoutes);
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
